@@ -29,9 +29,6 @@ pub fn write(path: &Path, width: u32, height: u32, image: &Vec<Color>) -> io::Re
 
 #[cfg(test)]
 mod tests {
-    use super::generate_test_image;
-    use std::path::Path;
-
     // #[test]
     // fn gen_test_image() {
     //     let res = generate_test_image();
