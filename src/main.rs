@@ -9,27 +9,35 @@ fn ray_color(r: &Ray) -> Color {
     // sphere centered at 0,0,-1, radius will be 0.5
     let sphere_center = Point3::new(0.0, 0.0, -1.0);
 
-    // if the ray hits the sphere return a Red Color
-    if hit_sphere(&sphere_center, 0.5, r) {
-        return Color::new(1.0, 0.0, 0.0);
+    // if the ray hits
+    let mut t = hit_sphere(&sphere_center, 0.5, r);
+    if t > 0.0 {
+        let n: Vec3 = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
+        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
     }
     // scale the ray direction to unit length (so −1.0 < y < 1.0)
     let unit_direction = r.direction().unit_vector();
-    let t = 0.5 * (unit_direction.y() + 1.0);
+    t = 0.5 * (unit_direction.y() + 1.0);
 
     // linear interpolation from white to blue
     (1.0 - t) * Color::new(1.0, 1.0, 1.0)
         + t * Color::new(0.5, 0.7, 1.0)
 }
 
-/// returns true of the Ray, `r`, intersects the sphere centered at `center` with radius `radius`
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> bool {
+/// if a ray hits the provided sphere, return the `t` value of the ray
+/// else return -1.0
+fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
     let oc = r.origin() - *center;
-    let a = r.direction().dot(r.direction());
-    let b = 2.0 * oc.dot(r.direction());
-    let c = oc.dot(oc) - radius * radius;
-    let discriminant = (b * b) - (4.0 * a * c);
-    discriminant > 0.0
+    let a = r.direction().length_squared();
+    let half_b = oc.dot(&(r.direction()));
+    let c = oc.length_squared() - radius * radius;
+    let discriminant = half_b * half_b - a * c;
+
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-half_b - f64::sqrt(discriminant)) / a
+    }
 }
 
 fn main() {
@@ -37,7 +45,7 @@ fn main() {
     let path = Path::new("./testGradient.ppm");
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 384;
-    let image_height = image_width / aspect_ratio as u32;
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
     let mut image: Vec<Color> = vec![];
 
     // camera is at the origin
