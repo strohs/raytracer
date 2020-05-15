@@ -1,6 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index};
-use super::RGBStringify;
 
 /// a 3 dimensional vector containing `x`,`y` and `z` coordinates
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
@@ -261,15 +260,6 @@ impl Display for Vec3 {
     }
 }
 
-impl RGBStringify for Vec3 {
-    fn to_rgb_string(&self) -> String {
-        let r = (255.0 * self.x) as u8;
-        let g = (255.0 * self.y) as u8;
-        let b = (255.0 * self.z) as u8;
-        format!("{} {} {}", r, g, b)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::Vec3;
@@ -302,7 +292,7 @@ mod tests {
     fn dot_product() {
         let v1 = Vec3::new(2.0, 3.0, 4.0);
         let v2 = Vec3::new(1.0, 2.0, 3.0);
-        assert_eq!(v1.dot(v2), 20.0);
+        assert_eq!(v1.dot(&v2), 20.0);
     }
 
     #[test]

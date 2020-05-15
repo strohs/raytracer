@@ -4,7 +4,6 @@ use std::io::prelude::*;
 use std::io::LineWriter;
 use std::path::Path;
 use crate::common::Color;
-use crate::common::RGBStringify;
 
 // max R,G, or B value for a PPM image
 const MAX_RGB_COLOR: u8 = 255;
@@ -21,7 +20,7 @@ pub fn write(path: &Path, width: u32, height: u32, image: &Vec<Color>) -> io::Re
     // write the image data
     for color in image.iter() {
         writer.write_all(
-            format!("{}\n", color.to_rgb_string()).as_bytes()
+            format!("{} {} {}\n", color.x() as u8, color.y() as u8, color.z() as u8).as_bytes()
         )?;
     }
     Ok(())

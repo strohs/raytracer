@@ -40,9 +40,8 @@ impl Camera {
     /// the given `u, v` offsets
     pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         let direction = self.lower_left_corner
-            + u * self.horizontal
-            + v * self.vertical
-            - self.origin;
+            + (u * self.horizontal)
+            + (v * self.vertical) - self.origin;
         Ray::new(self.origin, direction)
     }
 }

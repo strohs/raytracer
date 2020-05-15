@@ -1,6 +1,8 @@
 use crate::common::{Point3, Ray};
 use crate::common::hittable::{Hittable, HitRecord};
 
+
+/// a 3D sphere "object" with a `center` and `radius`
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Sphere {
     center: Point3,

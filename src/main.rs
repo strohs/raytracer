@@ -1,8 +1,9 @@
 use raytracer::ppm;
 use std::path::Path;
-use raytracer::common::{Color, Point3, Vec3, Ray, Sphere};
+use raytracer::common::{Color, Ray, Sphere, Camera, random_f64};
 use raytracer::common::hittable::{Hittable, HittableList};
 use std::rc::Rc;
+use raytracer::common::color::multi_sample_color;
 
 
 /// linearly blends white and blue depending on the height of the y coordinate after
@@ -11,7 +12,6 @@ use std::rc::Rc;
 fn ray_color<T>(r: &Ray, world: &T) -> Color
     where T: Hittable
 {
-
     // if a ray has hit something in the world, return the pixel color
     if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
         0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0))
@@ -31,13 +31,11 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
     let image_width = 384;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
+    let samples_per_pixel: u32 = 100;
     let mut image: Vec<Color> = vec![];
 
-    // camera is at the origin
-    let origin: Point3 = Point3::new(0.0, 0.0, 0.0);
-    let horizontal: Vec3 = Vec3::new(4.0, 0.0, 0.0);
-    let vertical: Vec3 = Vec3::new(0.0, 2.25, 0.0);
-    let lower_left_corner: Point3 = Point3::new(-2.0, -1.0, -1.0);
+    // axis-aligned camera
+    let camera = Camera::default();
 
     // create the Hittable objects and store them in a HittableList
     let mut world = HittableList::new();
@@ -50,17 +48,21 @@ fn main() {
     for j in (0..image_height).rev() {
         println!("Scanlines remaining {}", &j);
         for i in 0..image_width {
-            // u,v are offset vectors that move the ray endpoint across the screen
-            let u = i as f64 / (image_width - 1) as f64;
-            let v = j as f64 / (image_height - 1) as f64;
-            let r: Ray = Ray::new(
-                origin,
-                lower_left_corner + u * horizontal + v * vertical
-            );
-            let pixel_color: Color = ray_color(&r, &world);
+            let mut pixel_color: Color = Color::default(); // (0,0,0) color
+            // mutli-sample the pixels around the current pixel to compute and aliased pixel color
+            for _ in 0..samples_per_pixel {
+                // u,v are offsets that move the ray endpoint across the screen
+                let u = (i as f64 + random_f64()) / (image_width - 1) as f64;
+                let v = (j as f64 + random_f64()) / (image_height - 1) as f64;
+                let r: Ray = camera.get_ray(u, v);
+                pixel_color += ray_color(&r, &world);
+            }
+            pixel_color = multi_sample_color(pixel_color, samples_per_pixel);
             image.push(pixel_color);
         }
     }
+
+    // write the image to a file
     match ppm::write(path, image_width, image_height, &image) {
         Ok(()) => println!("test image created at {:?}", path),
         Err(e) => eprintln!("{}", e),
