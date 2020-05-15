@@ -35,18 +35,3 @@ pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
         _ => x,
     }
 }
-
-
-use rand::Rng;
-
-/// generate a random f64 in range [0..1)
-pub fn random_f64() -> f64 {
-    let mut rng = rand::thread_rng();
-    rng.gen()
-}
-
-/// generate a random f64 in range [min..max)
-pub fn random_f64_range(min: f64, max: f64) -> f64 {
-    let mut rng = rand::thread_rng();
-    rng.gen_range(min, max)
-}

@@ -1,26 +1,34 @@
 use crate::common::{Point3, Ray};
 use crate::common::hittable::{Hittable, HitRecord};
+use std::rc::Rc;
+use crate::material::Material;
 
 
 /// a 3D sphere "object" with a `center` and `radius`
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct Sphere {
     center: Point3,
     radius: f64,
+    mat_ptr: Rc<dyn Material>,
 }
 
 impl Sphere {
-    pub fn new(center: Point3, radius: f64) -> Self {
-        Self { center, radius }
+
+    pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Self {
+        Self { center, radius, mat_ptr }
     }
 
     /// convenience constructor to create a Sphere from x,y,z coordinates and a radius
-    pub fn from_coords(cx: f64, cy: f64, cz: f64, radius: f64) -> Self {
+    pub fn from_coords(cx: f64, cy: f64, cz: f64,
+                       radius: f64,
+                       mat_ptr: Rc<dyn Material>) -> Self
+    {
         Self {
             center: Point3::new(cx, cy, cz),
             radius,
+            mat_ptr,
         }
     }
+
 
     pub fn center(&self) -> Point3 { self.center }
 
@@ -35,7 +43,12 @@ impl Hittable for Sphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center) / self.radius;
-            HitRecord::with_face_normal(r, hit_point, &outward_normal, t)
+            HitRecord::with_face_normal(
+                r,
+                hit_point,
+                &outward_normal,
+                Rc::clone(&self.mat_ptr),
+                t)
         };
 
         let oc = r.origin() - self.center;

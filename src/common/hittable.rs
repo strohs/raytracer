@@ -1,5 +1,6 @@
 use crate::common::{Point3, Vec3, Ray};
 use std::rc::Rc;
+use crate::material::Material;
 
 /// A trait for objects in our scene that can be *hit* by a Ray
 pub trait Hittable {
@@ -9,13 +10,15 @@ pub trait Hittable {
 
 
 /// holds a 'record' of where a Ray "hit" a "hittable" object
-#[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct HitRecord {
     // point on the hittable that was hit by a ray
     pub p: Point3,
 
     // the normal vector at the point that was hit
     pub normal: Vec3,
+
+    // a shared pointer to the material that was hit
+    pub mat_ptr: Rc<dyn Material>,
 
     // position on the ray that hit the point, p
     pub t: f64,
@@ -28,10 +31,16 @@ pub struct HitRecord {
 impl HitRecord {
 
     /// create a new `HitRecord`
-    pub fn new(p: Point3, normal: Vec3, t: f64, front_face: bool) -> Self {
+    pub fn new(p: Point3,
+               normal: Vec3,
+               mat_ptr: Rc<dyn Material>,
+               t: f64,
+               front_face: bool) -> Self
+    {
         Self {
             p,
             normal,
+            mat_ptr,
             t,
             front_face,
         }
@@ -43,13 +52,17 @@ impl HitRecord {
     /// `p` - the point where the ray hit the hittable
     /// `outward_normal` - the outward normal of the given point `p`
     /// `t` - the position along `r` that hit `p`
-    pub fn with_face_normal(r: &Ray, p: Point3, outward_normal: &Vec3, t: f64) -> Self {
+    pub fn with_face_normal(r: &Ray,
+                            p: Point3,
+                            outward_normal: &Vec3,
+                            mat_ptr: Rc<dyn Material>,
+                            t: f64) -> Self {
         let front_face = HitRecord::hit_front_face(r, outward_normal);
         let normal = match front_face {
             true => *outward_normal,
             false => -*outward_normal,
         };
-        HitRecord::new(p, normal, t, front_face)
+        HitRecord::new(p, normal, mat_ptr, t, front_face)
     }
 
     /// returns true if the given ray has "hit" a front face of a Hittable, returns false

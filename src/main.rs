@@ -1,9 +1,11 @@
 use raytracer::ppm;
 use std::path::Path;
-use raytracer::common::{Color, Ray, Sphere, Camera, random_f64, Vec3};
+use raytracer::common::{Color, Ray, Sphere, Camera};
 use raytracer::common::hittable::{Hittable, HittableList};
 use std::rc::Rc;
 use raytracer::common::color::multi_sample_color;
+use raytracer::material::{Lambertian, Metal};
+use rand::{Rng};
 
 
 /// linearly blends white and blue depending on the height of the y coordinate after
@@ -14,12 +16,14 @@ fn ray_color<T>(r: &Ray, world: &T, depth: u32) -> Color
 {
     // if we've exceeded the ray bounce limit, no more light is gathered
     if depth == 0 {
-        Color::new(0.0,0.0,0.0)
-    } else if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
-        // if a ray has hit something in the world, bounce random child rays from the point
-        // that was hit to determine the ray's color
-        let target: Vec3 = rec.p + rec.normal + Vec3::random_unit_vector();
-        0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
+        Color::default()
+    } else if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
+        if let Some(scatter_rec) = rec.mat_ptr.scatter(r, rec) {
+            scatter_rec.attenuation * ray_color(&scatter_rec.scattered, world, depth - 1)
+        } else {
+            Color::default()
+        }
+
     } else {
         // return a linear interpolated Color from white to blue
         let unit_direction = r.direction().unit_vector();
@@ -44,13 +48,26 @@ fn main() {
     // axis-aligned camera
     let camera = Camera::default();
 
-    // create the Hittable objects and store them in a HittableList
-    let mut world = HittableList::new();
-    let sphere1 = Sphere::from_coords(0.0, 0.0, -1.0, 0.5);
-    let sphere2 = Sphere::from_coords(0.0, -100.5, -1.0, 100.0);
-    world.add(Rc::new(sphere1));
-    world.add(Rc::new(sphere2));
+    // materials
+    let lambertian_r = Lambertian::new(Color::new(0.7, 0.3, 0.3));
+    let lambertian_y = Lambertian::new(Color::new(0.8, 0.8, 0.0));
+    let metal_1 = Metal::new(Color::new(0.8, 0.6, 0.2));
+    let metal_2 = Metal::new(Color::new(0.8, 0.8, 0.8));
 
+    // create Hittable objects
+    let sphere_red = Sphere::from_coords(0.0, 0.0, -1.0, 0.5, Rc::new(lambertian_r));
+    let sphere_yel = Sphere::from_coords(0.0, -100.5, -1.0, 100.0, Rc::new(lambertian_y));
+    let sphere_m1 = Sphere::from_coords(1.0, 0.0, -1.0, 0.5, Rc::new(metal_1));
+    let sphere_m2 = Sphere::from_coords(-1.0, 0.0, -1.0, 0.5, Rc::new(metal_2));
+
+    // create the world and add objects to it
+    let mut world = HittableList::new();
+    world.add(Rc::new(sphere_red));
+    world.add(Rc::new(sphere_yel));
+    world.add(Rc::new(sphere_m1));
+    world.add(Rc::new(sphere_m2));
+
+    let mut rng = rand::thread_rng();
     // traverse the screen from lower left corner to upper right
     for j in (0..image_height).rev() {
         println!("Scanlines remaining {}", &j);
@@ -59,8 +76,8 @@ fn main() {
             // multi-sample the pixels around the current pixel to compute an aliased pixel color
             for _ in 0..samples_per_pixel {
                 // u,v are offsets that move the ray endpoint across the screen
-                let u = (i as f64 + random_f64()) / (image_width - 1) as f64;
-                let v = (j as f64 + random_f64()) / (image_height - 1) as f64;
+                let u = (i as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
+                let v = (j as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
                 let r: Ray = camera.get_ray(u, v);
                 pixel_color += ray_color(&r, &world, max_depth);
             }

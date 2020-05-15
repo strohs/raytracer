@@ -223,6 +223,32 @@ impl AddAssign for Vec3 {
     }
 }
 
+impl Mul for Vec3 {
+    type Output = Vec3;
+
+    /// multiply each field of this Vec3 by the corresponding field in another Vec3
+    /// This is **not** the cross product.
+    ///
+    /// # Example
+    /// ```
+    /// use raytracer::common::Vec3;
+    ///
+    /// let v1 = Vec3::new(1.0, 2.0, 3.0);
+    /// let v2 = Vec3::new(5.0, 6.0, 7.0);
+    /// let res = v1 * v2;
+    /// assert_eq!(res.x(), 5.0);
+    /// assert_eq!(res.y(), 12.0);
+    /// assert_eq!(res.z(), 21.0);
+    /// ```
+    fn mul(self, rhs: Self) -> Self::Output {
+        Vec3 {
+            x: self.x * rhs.x,
+            y: self.y * rhs.y,
+            z: self.z * rhs.z,
+        }
+    }
+}
+
 impl Mul<f64> for Vec3 {
     type Output = Self;
 
@@ -415,6 +441,16 @@ mod tests {
         assert_eq!(v1.x, 5.0);
         assert_eq!(v1.y, 10.0);
         assert_eq!(v1.z, 15.0);
+    }
+
+    #[test]
+    fn multiply_vec3_by_another_vec3() {
+        let v1 = Vec3::new(1.0, 2.0, 3.0);
+        let v2 = Vec3::new(5.0, 6.0, 7.0);
+        let r = v1 * v2;
+        assert_eq!(r.x, 5.0);
+        assert_eq!(r.y, 12.0);
+        assert_eq!(r.z, 21.0);
     }
 
     #[test]
