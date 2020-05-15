@@ -1,7 +1,6 @@
 use crate::common::{Vec3, Point3};
 
-/// a three dimensional Ray consisting of an origin point and a direction,
-/// both stored as a [`Vec3`]
+/// a three dimensional Ray consisting of an origin point and a direction ['Vec3'],
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 pub struct Ray {
     orig: Point3,

@@ -1,42 +1,26 @@
 use raytracer::ppm;
 use std::path::Path;
-use raytracer::common::{Color, Point3, Vec3, Ray};
+use raytracer::common::{Color, Point3, Vec3, Ray, Sphere};
+use raytracer::common::hittable::{Hittable, HittableList};
+
 
 /// linearly blends white and blue depending on the height of the y coordinate after
 /// scaling the ray direction to unit length (so −1.0 < y < 1.0)
 /// When `t=1.0` I want blue. When `t=0.0` I want white. In between, I want a blend
-fn ray_color(r: &Ray) -> Color {
-    // sphere centered at 0,0,-1, radius will be 0.5
-    let sphere_center = Point3::new(0.0, 0.0, -1.0);
+fn ray_color<T>(r: &Ray, world: &T) -> Color
+    where T: Hittable
+{
 
-    // if the ray hits
-    let mut t = hit_sphere(&sphere_center, 0.5, r);
-    if t > 0.0 {
-        let n: Vec3 = (r.at(t) - Vec3::new(0.0, 0.0, -1.0)).unit_vector();
-        return 0.5 * Color::new(n.x() + 1.0, n.y() + 1.0, n.z() + 1.0);
-    }
-    // scale the ray direction to unit length (so −1.0 < y < 1.0)
-    let unit_direction = r.direction().unit_vector();
-    t = 0.5 * (unit_direction.y() + 1.0);
-
-    // linear interpolation from white to blue
-    (1.0 - t) * Color::new(1.0, 1.0, 1.0)
-        + t * Color::new(0.5, 0.7, 1.0)
-}
-
-/// if a ray hits the provided sphere, return the `t` value of the ray
-/// else return -1.0
-fn hit_sphere(center: &Point3, radius: f64, r: &Ray) -> f64 {
-    let oc = r.origin() - *center;
-    let a = r.direction().length_squared();
-    let half_b = oc.dot(&(r.direction()));
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = half_b * half_b - a * c;
-
-    if discriminant < 0.0 {
-        -1.0
+    // if a ray has hit something in the world, return the pixel color
+    if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
+        0.5 * (rec.normal + Color::new(1.0, 1.0, 1.0))
     } else {
-        (-half_b - f64::sqrt(discriminant)) / a
+        // return a linear interpolated Color from white to blue
+        let unit_direction = r.direction().unit_vector();
+        let t = 0.5 * (unit_direction.y() + 1.0);
+
+        (1.0 - t) * Color::new(1.0, 1.0, 1.0)
+            + t * Color::new(0.5, 0.7, 1.0)
     }
 }
 
@@ -52,10 +36,14 @@ fn main() {
     let origin: Point3 = Point3::new(0.0, 0.0, 0.0);
     let horizontal: Vec3 = Vec3::new(4.0, 0.0, 0.0);
     let vertical: Vec3 = Vec3::new(0.0, 2.25, 0.0);
-    let lower_left_corner: Point3 = origin
-        - horizontal / 2.0
-        - vertical / 2.0
-        - Vec3::new(0.0,0.0,1.0);
+    let lower_left_corner: Point3 = Point3::new(-2.0, -1.0, -1.0);
+
+    // create the Hittable objects and store them in a HittableList
+    let mut world = HittableList::new();
+    let sphere1 = Sphere::from_coords(0.0, 0.0, -1.0, 0.5);
+    let sphere2 = Sphere::from_coords(0.0, -100.5, -1.0, 100.0);
+    world.add(sphere1);
+    world.add(sphere2);
 
     // traverse the screen from lower left corner to upper right
     for j in (0..image_height).rev() {
@@ -68,7 +56,7 @@ fn main() {
                 origin,
                 lower_left_corner + u * horizontal + v * vertical
             );
-            let pixel_color: Color = ray_color(&r);
+            let pixel_color: Color = ray_color(&r, &world);
             image.push(pixel_color);
         }
     }
