@@ -22,14 +22,20 @@ pub type Point3 = Vec3;
 pub type Color = Vec3;
 
 
-
-use core::f64::consts::PI;
-
 /// utility function for converting degrees to radians
 pub fn degrees_to_radians(degrees: f64) -> f64 {
-    degrees * PI / 180.0
+    degrees * core::f64::consts::PI / 180.0
 }
 
+
+/// clamps `x` to the range `[min..=max]`
+pub fn clamp(x: f64, min: f64, max: f64) -> f64 {
+    match x {
+        _xmin if x < min => min,
+        _xmax if x > max => max,
+        _ => x,
+    }
+}
 
 
 use rand::Rng;
