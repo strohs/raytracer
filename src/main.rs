@@ -15,10 +15,10 @@ fn ray_color<T>(r: &Ray, world: &T, depth: u32) -> Color
     // if we've exceeded the ray bounce limit, no more light is gathered
     if depth == 0 {
         Color::new(0.0,0.0,0.0)
-    } else if let Some(rec) = world.hit(r, 0.0, f64::INFINITY) {
-        // if a ray has hit something in the world, bounce more child rays to determine
-        // the ray's color
-        let target: Vec3 = rec.p + rec.normal + Vec3::random_in_unit_sphere();
+    } else if let Some(rec) = world.hit(r, 0.001, f64::INFINITY) {
+        // if a ray has hit something in the world, bounce random child rays from the point
+        // that was hit to determine the ray's color
+        let target: Vec3 = rec.p + rec.normal + Vec3::random_unit_vector();
         0.5 * ray_color(&Ray::new(rec.p, target - rec.p), world, depth - 1)
     } else {
         // return a linear interpolated Color from white to blue

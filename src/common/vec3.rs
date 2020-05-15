@@ -1,6 +1,7 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index};
 use crate::common::clamp;
+use core::f64::consts::PI;
 use rand::Rng;
 
 /// a 3 dimensional vector containing `x`,`y` and `z` coordinates
@@ -64,6 +65,7 @@ impl Vec3 {
         *self / self.length()
     }
 
+
     /// returns a `Vec3` with it's `x,y,z` fields set to a random f64 in the range `0..1`
     pub fn random() -> Self {
         let mut rng = rand::thread_rng();
@@ -85,12 +87,44 @@ impl Vec3 {
     }
 
     /// returns a random `Vec3` that is within the bounds of a (imaginary) unit sphere.
+    /// Uses "rejection method" algorithm that loops continuously until x,y,z coordinates
+    /// are generated that lie within a unit sphere
     pub fn random_in_unit_sphere() -> Self {
         loop {
             let p = Vec3::random_range(-1.0, 1.0);
             if p.length_squared() < 1.0 {
                 return p
             }
+        }
+    }
+
+    /// returns a random `Vec3` using
+    /// [Lambertian Diffuse](https://en.wikipedia.org/wiki/Lambert%27s_cosine_law) to generate
+    /// a vector that is more uniformly distributed
+    pub fn random_unit_vector() -> Self {
+        let mut rng = rand::thread_rng();
+        let a = rng.gen_range(0.0, 2.0 * PI);
+        let z = rng.gen_range(-1.0, 1.0);
+        let r = f64::sqrt(1.0 - z * z);
+
+        Self {
+            x: r * a.cos(),
+            y: r * a.sin(),
+            z,
+        }
+    }
+
+    /// an alternative Vec3 generation function that returns a random vector within the same
+    /// hemisphere of the passed in `normal`. This type of method was commonly used before
+    /// Lambertian Diffuse implemented in [`Vec3::random_unit_vector`]
+    pub fn random_in_hemisphere(normal: &Vec3) -> Self {
+        let in_unit_sphere = Self::random_in_unit_sphere();
+
+        if in_unit_sphere.dot(normal) > 0.0 {
+            // in the same hemisphere as the normal
+            in_unit_sphere
+        } else {
+            -in_unit_sphere
         }
     }
 
