@@ -1,6 +1,7 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index};
 use crate::common::clamp;
+use rand::Rng;
 
 /// a 3 dimensional vector containing `x`,`y` and `z` coordinates
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
@@ -61,6 +62,36 @@ impl Vec3 {
     /// computes the unit vector of this Vec3 and returns a new Vec3
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
+    }
+
+    /// returns a `Vec3` with it's `x,y,z` fields set to a random f64 in the range `0..1`
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            x: rng.gen(),
+            y: rng.gen(),
+            z: rng.gen(),
+        }
+    }
+
+    /// returns a `Vec3` with it's `x,y,z` fields set to a random f64 in the range `min..max`
+    pub fn random_range(min: f64, max: f64) -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            x: rng.gen_range(min, max),
+            y: rng.gen_range(min, max),
+            z: rng.gen_range(min, max),
+        }
+    }
+
+    /// returns a random `Vec3` that is within the bounds of a (imaginary) unit sphere.
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Vec3::random_range(-1.0, 1.0);
+            if p.length_squared() < 1.0 {
+                return p
+            }
+        }
     }
 
     /// clamps each `x,y,z` field of this `Vec3` to be between `min` and `max`
