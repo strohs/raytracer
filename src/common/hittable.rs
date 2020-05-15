@@ -92,8 +92,8 @@ impl HittableList {
     }
 
     /// add a hittable object to the hittable list
-    pub fn add<T: 'static + Hittable>(&mut self, object: T) {
-        self.objects.push(Rc::new(object));
+    pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        self.objects.push(object);
     }
 
 }

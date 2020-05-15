@@ -2,6 +2,7 @@ use raytracer::ppm;
 use std::path::Path;
 use raytracer::common::{Color, Point3, Vec3, Ray, Sphere};
 use raytracer::common::hittable::{Hittable, HittableList};
+use std::rc::Rc;
 
 
 /// linearly blends white and blue depending on the height of the y coordinate after
@@ -42,8 +43,8 @@ fn main() {
     let mut world = HittableList::new();
     let sphere1 = Sphere::from_coords(0.0, 0.0, -1.0, 0.5);
     let sphere2 = Sphere::from_coords(0.0, -100.5, -1.0, 100.0);
-    world.add(sphere1);
-    world.add(sphere2);
+    world.add(Rc::new(sphere1));
+    world.add(Rc::new(sphere2));
 
     // traverse the screen from lower left corner to upper right
     for j in (0..image_height).rev() {
@@ -64,4 +65,5 @@ fn main() {
         Ok(()) => println!("test image created at {:?}", path),
         Err(e) => eprintln!("{}", e),
     }
+
 }
