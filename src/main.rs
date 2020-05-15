@@ -49,7 +49,7 @@ fn main() {
         println!("Scanlines remaining {}", &j);
         for i in 0..image_width {
             let mut pixel_color: Color = Color::default(); // (0,0,0) color
-            // mutli-sample the pixels around the current pixel to compute and aliased pixel color
+            // multi-sample the pixels around the current pixel to compute an aliased pixel color
             for _ in 0..samples_per_pixel {
                 // u,v are offsets that move the ray endpoint across the screen
                 let u = (i as f64 + random_f64()) / (image_width - 1) as f64;

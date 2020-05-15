@@ -1,5 +1,6 @@
 use std::fmt::{Display, Formatter, Result};
 use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index};
+use crate::common::clamp;
 
 /// a 3 dimensional vector containing `x`,`y` and `z` coordinates
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
@@ -60,6 +61,13 @@ impl Vec3 {
     /// computes the unit vector of this Vec3 and returns a new Vec3
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
+    }
+
+    /// clamps each `x,y,z` field of this `Vec3` to be between `min` and `max`
+    pub fn clamped(&mut self, min: f64, max: f64) {
+        self.x = clamp(self.x, min, max);
+        self.y = clamp(self.y, min, max);
+        self.z = clamp(self.z, min, max);
     }
 }
 
