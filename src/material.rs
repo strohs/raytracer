@@ -48,7 +48,7 @@ fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Vec3 {
     r_out_parallel + r_out_perp
 }
 
-/// Schlick's approximation for determining glass "refractivity"
+/// Schlick's approximation for determining how much light is **reflected** for a glass material
 fn schlick(cosine: f64, ref_idx: f64) -> f64 {
     let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
     r0 = r0 * r0;

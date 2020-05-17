@@ -29,27 +29,22 @@ impl Material for Dielectric {
         let unit_direction = r_in.direction().unit_vector();
         let cos_theta = (-unit_direction).dot(&rec.normal).min(1.0);
         let sin_theta = (1.0 - cos_theta * cos_theta).sqrt();
-
-        if etai_over_etat * sin_theta > 1.0 {
-            // always reflects
-            let reflected = material::reflect(&unit_direction, &rec.normal);
-            let scattered = Ray::new(rec.p, reflected);
-            //println!("reflected {:?}", &scattered);
-            return Some(ScatterRecord::new(attenuation, scattered));
-        }
-
         let reflect_prob = material::schlick(cos_theta, etai_over_etat);
-        let mut rng = thread_rng();
-        if rng.gen::<f64>() < reflect_prob {
-            let reflected = material::reflect(&unit_direction, &rec.normal);
-            let scattered = Ray::new(rec.p, reflected);
-            return Some(ScatterRecord::new(attenuation, scattered));
-        }
 
-        let refracted = material::refract(&unit_direction, &rec.normal, etai_over_etat);
-        let scattered = Ray::new(rec.p, refracted);
-        //println!("refracted {:?}", &scattered);
-        Some(ScatterRecord::new(attenuation, scattered))
+        let scattered_ray = if etai_over_etat * sin_theta > 1.0 {
+            // ray is always reflected
+            let reflected = material::reflect(&unit_direction, &rec.normal);
+            Ray::new(rec.p, reflected)
+        } else if thread_rng().gen::<f64>() < reflect_prob {
+            // ray had a chance to reflect...so reflect it
+            let reflected = material::reflect(&unit_direction, &rec.normal);
+            Ray::new(rec.p, reflected)
+        } else {
+            // ray is always refracted
+            let refracted = material::refract(&unit_direction, &rec.normal, etai_over_etat);
+            Ray::new(rec.p, refracted)
+        };
+        Some(ScatterRecord::new(attenuation, scattered_ray))
 
     }
 }
