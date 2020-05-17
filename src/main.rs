@@ -4,9 +4,11 @@ use raytracer::common::{Color, Ray, Sphere, Camera};
 use raytracer::common::hittable::{Hittable, HittableList};
 use std::rc::Rc;
 use raytracer::common::color::multi_sample_color;
-use raytracer::material::{Lambertian, Metal};
+use raytracer::material::{Lambertian, Metal, Dielectric, Material};
 use rand::{Rng};
 
+// max recursion depth for bouncing rays
+static MAX_BOUNCE_DEPTH: u32 = 50;
 
 /// linearly blends white and blue depending on the height of the y coordinate after
 /// scaling the ray direction to unit length (so −1.0 < y < 1.0)
@@ -41,8 +43,7 @@ fn main() {
     let image_width = 384;
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let samples_per_pixel: u32 = 100;
-    // max recursion depth allowed for ray bounce
-    let max_depth: u32 = 50;
+
     let mut image: Vec<Color> = vec![];
 
     // axis-aligned camera
@@ -50,22 +51,26 @@ fn main() {
 
     // materials
     let lambertian_r = Lambertian::new(Color::new(0.7, 0.3, 0.3));
+    let lambertian_b = Lambertian::new(Color::new(0.1, 0.2, 0.5));
     let lambertian_y = Lambertian::new(Color::new(0.8, 0.8, 0.0));
-    let metal_1 = Metal::new(Color::new(0.8, 0.6, 0.2));
-    let metal_2 = Metal::new(Color::new(0.8, 0.8, 0.8));
+    let metal_1 = Metal::new(Color::new(0.8, 0.6, 0.2), 0.3);
+    let metal_grey = Metal::new(Color::new(0.8, 0.8, 0.8), 0.1);
+    let glass: Rc<dyn Material> = Rc::new(Dielectric::new(1.5));
 
     // create Hittable objects
-    let sphere_red = Sphere::from_coords(0.0, 0.0, -1.0, 0.5, Rc::new(lambertian_r));
+    let sphere_mid = Sphere::from_coords(0.0, 0.0, -1.0, 0.5, Rc::new(lambertian_b));
     let sphere_yel = Sphere::from_coords(0.0, -100.5, -1.0, 100.0, Rc::new(lambertian_y));
-    let sphere_m1 = Sphere::from_coords(1.0, 0.0, -1.0, 0.5, Rc::new(metal_1));
-    let sphere_m2 = Sphere::from_coords(-1.0, 0.0, -1.0, 0.5, Rc::new(metal_2));
+    let sphere_right = Sphere::from_coords(1.0, 0.0, -1.0, 0.5, Rc::new(metal_1));
+    let sphere_left = Sphere::from_coords(-1.0, 0.0, -1.0, 0.5, Rc::clone(&glass));
+    let sphere_bubble = Sphere::from_coords(-1.0, 0.0, -1.0, -0.45, Rc::clone(&glass));
 
     // create the world and add objects to it
     let mut world = HittableList::new();
-    world.add(Rc::new(sphere_red));
+    world.add(Rc::new(sphere_mid));
     world.add(Rc::new(sphere_yel));
-    world.add(Rc::new(sphere_m1));
-    world.add(Rc::new(sphere_m2));
+    world.add(Rc::new(sphere_right));
+    world.add(Rc::new(sphere_left));
+    //world.add(Rc::new(sphere_bubble));
 
     let mut rng = rand::thread_rng();
     // traverse the screen from lower left corner to upper right
@@ -79,7 +84,7 @@ fn main() {
                 let u = (i as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
                 let v = (j as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
                 let r: Ray = camera.get_ray(u, v);
-                pixel_color += ray_color(&r, &world, max_depth);
+                pixel_color += ray_color(&r, &world, MAX_BOUNCE_DEPTH);
             }
             pixel_color = multi_sample_color(pixel_color, samples_per_pixel);
             image.push(pixel_color);
