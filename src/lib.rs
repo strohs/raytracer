@@ -1,3 +1,4 @@
-pub mod ppm;
+pub mod util;
 pub mod common;
 pub mod material;
+pub mod hittable;

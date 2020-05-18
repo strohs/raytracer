@@ -4,11 +4,6 @@ pub use vec3::*;
 pub mod ray;
 pub use ray::*;
 
-pub mod hittable;
-
-pub mod sphere;
-pub use sphere::*;
-
 pub mod camera;
 pub use camera::*;
 

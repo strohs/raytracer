@@ -8,7 +8,7 @@ pub mod dielectric;
 pub use dielectric::*;
 
 use crate::common::{Ray, Color, Vec3};
-use crate::common::hittable::HitRecord;
+use crate::hittable::HitRecord;
 use std::ops::Neg;
 
 /// holds the details on how a `Material` scattered an incoming `Ray`.

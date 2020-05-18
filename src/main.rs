@@ -1,9 +1,9 @@
-use raytracer::ppm;
-use std::path::Path;
-use raytracer::common::{Color, Ray, Sphere, Camera, Point3, Vec3};
-use raytracer::common::hittable::{Hittable, HittableList};
 use std::rc::Rc;
-use raytracer::common::color::multi_sample_color;
+use raytracer::util::ppm;
+use std::path::Path;
+use raytracer::common::{Color, Ray, Camera, Point3, Vec3};
+use raytracer::hittable::{Hittable, HittableList, Sphere};
+use raytracer::common::color;
 use raytracer::material::{Lambertian, Metal, Dielectric, Material};
 use rand::{Rng};
 
@@ -98,7 +98,7 @@ fn main() {
                 let r: Ray = camera.get_ray(u, v);
                 pixel_color += ray_color(&r, &world, MAX_BOUNCE_DEPTH);
             }
-            pixel_color = multi_sample_color(pixel_color, samples_per_pixel);
+            pixel_color = color::multi_sample_color(pixel_color, samples_per_pixel);
             image.push(pixel_color);
         }
     }

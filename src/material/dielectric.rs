@@ -1,6 +1,6 @@
 use crate::material::{Material, ScatterRecord};
 use crate::common::{Ray, Color};
-use crate::common::hittable::HitRecord;
+use crate::hittable::HitRecord;
 use crate::material;
 use rand::{Rng, thread_rng};
 

@@ -1,6 +1,6 @@
 use crate::common::{Color, Ray, Vec3};
 use crate::material::{Material, ScatterRecord};
-use crate::common::hittable::HitRecord;
+use crate::hittable::HitRecord;
 
 /// lambertian diffuse material
 #[derive(Debug, Copy, Clone)]

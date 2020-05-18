@@ -1,7 +1,7 @@
-use crate::common::{Point3, Ray};
-use crate::common::hittable::{Hittable, HitRecord};
 use std::rc::Rc;
+use crate::common::{Point3, Ray};
 use crate::material::Material;
+use crate::hittable::{Hittable, HitRecord};
 
 
 /// a 3D sphere "object" with a `center` and `radius`
