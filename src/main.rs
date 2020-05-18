@@ -1,6 +1,6 @@
 use raytracer::ppm;
 use std::path::Path;
-use raytracer::common::{Color, Ray, Sphere, Camera};
+use raytracer::common::{Color, Ray, Sphere, Camera, Point3, Vec3};
 use raytracer::common::hittable::{Hittable, HittableList};
 use std::rc::Rc;
 use raytracer::common::color::multi_sample_color;
@@ -46,8 +46,13 @@ fn main() {
 
     let mut image: Vec<Color> = vec![];
 
-    // axis-aligned camera
-    let camera = Camera::default();
+    // camera
+    let camera = Camera::new(
+        Point3::new(-2.0, 2.0, 1.0),
+        Point3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        40.0,
+    (image_width / image_height) as f64);
 
     // materials
     let lambertian_r = Lambertian::new(Color::new(0.7, 0.3, 0.3));
@@ -61,6 +66,7 @@ fn main() {
     let sphere_mid = Sphere::from_coords(0.0, 0.0, -1.0, 0.5, Rc::new(lambertian_b));
     let sphere_yel = Sphere::from_coords(0.0, -100.5, -1.0, 100.0, Rc::new(lambertian_y));
     let sphere_right = Sphere::from_coords(1.0, 0.0, -1.0, 0.5, Rc::new(metal_1));
+    // next two spheres form a hollow glass sphere
     let sphere_left = Sphere::from_coords(-1.0, 0.0, -1.0, 0.5, Rc::clone(&glass));
     let sphere_bubble = Sphere::from_coords(-1.0, 0.0, -1.0, -0.45, Rc::clone(&glass));
 
@@ -70,7 +76,7 @@ fn main() {
     world.add(Rc::new(sphere_yel));
     world.add(Rc::new(sphere_right));
     world.add(Rc::new(sphere_left));
-    //world.add(Rc::new(sphere_bubble));
+    world.add(Rc::new(sphere_bubble));
 
     let mut rng = rand::thread_rng();
     // traverse the screen from lower left corner to upper right
