@@ -32,16 +32,9 @@ impl Vec3 {
         self.z
     }
 
-    /// returns this Vec3's *magnitude* a.k.a *length*
+    /// returns this Vec3's *magnitude* a.k.a *length*: `∥⃗v∥=√x2+y2+z2`
     pub fn length(&self) -> f64 {
         f64::sqrt(self.length_squared())
-    }
-
-    /// returns the square of this Vec3's length
-    pub fn length_squared(&self) -> f64 {
-        (self.x * self.x)
-            + (self.y * self.y)
-            + (self.z * self.z)
     }
 
     /// returns the dot product of this Vec3 and other
@@ -51,6 +44,11 @@ impl Vec3 {
             + self.z * other.z
     }
 
+    /// returns the square of this Vec3's length, which is equal to this Vec3 dotted with itself
+    pub fn length_squared(&self) -> f64 {
+        self.dot(self)
+    }
+    
     /// returns a new Vec3 that is the cross product of this Vec3 and other
     pub fn cross(&self, other: Self) -> Self {
         Self {
@@ -125,6 +123,21 @@ impl Vec3 {
             in_unit_sphere
         } else {
             -in_unit_sphere
+        }
+    }
+
+    /// generates a random vector within an "unit disk". Essentially a unit vector with a
+    /// a random x,y value and z=0.0
+    pub fn random_in_unit_disk() -> Self {
+        let mut rng = rand::thread_rng();
+        loop {
+            let p = Vec3::new(
+                rng.gen_range(-1.0, 1.0),
+                rng.gen_range(-1.0, 1.0),
+                0.0);
+            if p.length_squared() < 1.0 {
+                return p
+            }
         }
     }
 

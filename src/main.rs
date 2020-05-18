@@ -7,7 +7,7 @@ use raytracer::common::color::multi_sample_color;
 use raytracer::material::{Lambertian, Metal, Dielectric, Material};
 use rand::{Rng};
 
-// max recursion depth for bouncing rays
+// max recursion depth allowed when bouncing rays of hittables
 static MAX_BOUNCE_DEPTH: u32 = 50;
 
 /// linearly blends white and blue depending on the height of the y coordinate after
@@ -46,13 +46,19 @@ fn main() {
 
     let mut image: Vec<Color> = vec![];
 
-    // camera
-    let camera = Camera::new(
-        Point3::new(-2.0, 2.0, 1.0),
-        Point3::new(0.0, 0.0, -1.0),
-        Vec3::new(0.0, 1.0, 0.0),
-        40.0,
-    (image_width / image_height) as f64);
+    // camera settings
+    let look_from = Point3::new(3.0, 3.0, 2.0);
+    let look_at = Point3::new(0.0, 0.0, -1.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let aspect_ratio = (image_width / image_height) as f64;
+    let dist_to_focus = (look_from - look_at).length();
+    let aperture = 2.0;
+    let camera = Camera::new(look_from, look_at,
+                             vup,
+                             20.0,
+                             aspect_ratio,
+                             aperture,
+                             dist_to_focus);
 
     // materials
     let lambertian_r = Lambertian::new(Color::new(0.7, 0.3, 0.3));
