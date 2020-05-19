@@ -63,7 +63,7 @@ impl Camera {
 
 
     /// return a `Ray` that originates from this camera's origin, with a direction towards
-    /// the given `u, v` offsets
+    /// the given `s, t` offsets
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rd.x() + self.v * rd.y();

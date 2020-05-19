@@ -7,7 +7,7 @@ pub type Color = Vec3;
 pub const MAX_RGB_COLOR: u8 = 255;
 
 /// returns a new pixel color using multi-sample color computation
-pub fn multi_sample_color(pixel_color: Color, samples_per_pixel: u32) -> Color {
+pub fn multi_sample(pixel_color: Color, samples_per_pixel: u32) -> Color {
     let mut r = pixel_color.x();
     let mut g = pixel_color.y();
     let mut b = pixel_color.z();

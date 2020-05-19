@@ -28,7 +28,7 @@ fn ray_color<T>(r: &Ray, world: &T, depth: u32) -> Color
         }
 
     } else {
-        // return a linear interpolated Color from white to blue
+        // nothing hit, return a linear interpolated Color from white to blue
         let unit_direction = r.direction().unit_vector();
         let t = 0.5 * (unit_direction.y() + 1.0);
 
@@ -38,11 +38,11 @@ fn ray_color<T>(r: &Ray, world: &T, depth: u32) -> Color
 }
 
 fn main() {
-    let path = Path::new("./testGradient.ppm");
     let aspect_ratio = 16.0 / 9.0;
-    let image_width = 384;
-    let image_height = (image_width as f64 / aspect_ratio) as u32; // 576 if width is 1029 at 16:9
-
+    let image_width = 1024;
+    let image_height = (image_width as f64 / aspect_ratio) as u32; // 576 if width is 1024 at 16:9
+    let filename = format!("./raytrace_final_{}x{}.ppm", image_width, image_height);
+    let path = Path::new(&filename);
 
     let mut image: Vec<Color> = vec![];
 
@@ -55,7 +55,7 @@ fn main() {
     let camera = Camera::new(look_from, look_at,
                              vup,
                              20.0,
-                             (image_width / image_height) as f64,
+                             aspect_ratio,
                              aperture,
                              dist_to_focus);
 
@@ -63,7 +63,7 @@ fn main() {
     let world = scenes::random_scene();
 
     let mut rng = rand::thread_rng();
-
+    
     // traverse the screen from lower left corner to upper right
     for j in (0..image_height).rev() {
         println!("Scanlines remaining {}", &j);
@@ -71,13 +71,13 @@ fn main() {
             let mut pixel_color: Color = Color::default(); // (0,0,0) color
             // multi-sample the pixels around the current pixel to compute an aliased pixel color
             for _ in 0..MAX_SAMPLES_PER_PIXEL {
-                // u,v are offsets that move the ray endpoint across the screen
+                // u,v are offsets that randomly choose a pixel around the current pixel
                 let u = (i as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
                 let v = (j as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
                 let r: Ray = camera.get_ray(u, v);
                 pixel_color += ray_color(&r, &world, MAX_BOUNCE_DEPTH);
             }
-            pixel_color = color::multi_sample_color(pixel_color, MAX_SAMPLES_PER_PIXEL);
+            pixel_color = color::multi_sample(pixel_color, MAX_SAMPLES_PER_PIXEL);
             image.push(pixel_color);
         }
     }
