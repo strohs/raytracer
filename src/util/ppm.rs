@@ -7,7 +7,7 @@ use crate::common::Color;
 use crate::common::color;
 
 
-pub fn write(path: &Path, width: u32, height: u32, image: &Vec<Color>) -> io::Result<()> {
+pub fn write(path: &Path, width: u32, height: u32, image: &[Color]) -> io::Result<()> {
     let file = File::create(path)?;
     let mut writer = LineWriter::new(file);
 

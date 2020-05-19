@@ -50,11 +50,13 @@ impl HitRecord {
                             p: Point3,
                             outward_normal: &Vec3,
                             mat_ptr: Rc<dyn Material>,
-                            t: f64) -> Self {
+                            t: f64) -> Self
+    {
         let front_face = HitRecord::hit_front_face(r, outward_normal);
-        let normal = match front_face {
-            true => *outward_normal,
-            false => -*outward_normal,
+        let normal = if front_face {
+            *outward_normal
+        } else {
+            -*outward_normal
         };
         HitRecord::new(p, normal, mat_ptr, t, front_face)
     }
@@ -69,9 +71,10 @@ impl HitRecord {
     /// a Ray and outward_normal
     pub fn set_face_normal(&mut self, r: &Ray, outward_normal: &Vec3) {
         self.front_face = HitRecord::hit_front_face(r, outward_normal);
-        self.normal = match self.front_face {
-            true => *outward_normal,
-            false => -*outward_normal,
+        self.normal = if self.front_face {
+            *outward_normal
+        } else {
+            -*outward_normal
         }
     }
 

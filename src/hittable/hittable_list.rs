@@ -47,3 +47,11 @@ impl Hittable for HittableList {
         hit_anything
     }
 }
+
+impl Default for HittableList {
+    fn default() -> Self {
+        Self {
+            objects: vec![]
+        }
+    }
+}

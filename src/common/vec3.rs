@@ -326,11 +326,11 @@ impl Div<f64> for Vec3 {
 
     /// divide each x,y,z field of this Vec3 by a scalar (f64) value and return a new Vec3
     fn div(self, rhs: f64) -> Self::Output {
-        let recip = 1.0 / rhs;
+
         Self {
-            x: recip * self.x,
-            y: recip * self.y,
-            z: recip * self.z
+            x: self.x / rhs,
+            y: self.y / rhs,
+            z: self.z / rhs,
         }
     }
 }
