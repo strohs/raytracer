@@ -49,10 +49,10 @@ pub fn render(camera: Arc<Camera>,
         rx
     };
 
-    // stores the image colors. bottom rows of image are stored first, at the beginning of the Vec
+    // allocate a vector to store the pixel colors of the image (in row major format)
     let mut image: Vec<Color> = vec![Color::default(); (image_width * image_height) as usize];
 
-    // read finished jobs from the channel
+    // read finished jobs data from the channel
     for (pixel_row, pixel_col, pixel_color) in rx.iter() {
         // ppm images are stored in reverse row order (start from lower left of image to upper right)
         let index = ((image_height - 1 - pixel_col) * image_width + pixel_row) as usize;

@@ -18,7 +18,7 @@ pub fn build_default_sphere_scene(image_width: u32, aspect_ratio: f64)
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
     let aperture = 0.1;
-    let vfov = 40.0;
+    let vfov = 20.0;
     let camera = Camera::new(
         look_from,
         look_at,
