@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::common::{Point3, Vec3, Ray};
 use crate::material::Material;
 
@@ -11,7 +11,7 @@ pub struct HitRecord {
     pub normal: Vec3,
 
     // a (shared) pointer to the material that was hit
-    pub mat_ptr: Rc<dyn Material>,
+    pub mat_ptr: Arc<dyn Material>,
 
     // position along the ray that hit the point, `p`
     pub t: f64,
@@ -26,7 +26,7 @@ impl HitRecord {
     /// create a new `HitRecord`
     pub fn new(p: Point3,
                normal: Vec3,
-               mat_ptr: Rc<dyn Material>,
+               mat_ptr: Arc<dyn Material>,
                t: f64,
                front_face: bool) -> Self
     {
@@ -49,7 +49,7 @@ impl HitRecord {
     pub fn with_face_normal(r: &Ray,
                             p: Point3,
                             outward_normal: &Vec3,
-                            mat_ptr: Rc<dyn Material>,
+                            mat_ptr: Arc<dyn Material>,
                             t: f64) -> Self
     {
         let front_face = HitRecord::hit_front_face(r, outward_normal);

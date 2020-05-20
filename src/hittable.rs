@@ -10,7 +10,7 @@ pub use hittable_list::*;
 use crate::common::{Ray};
 
 /// A trait for objects in our scene that can be *hit* by a Ray
-pub trait Hittable {
+pub trait Hittable: Send + Sync {
 
     /// returns `Some(HitRecord)` if the given `[Ray]` `r`, has *hit* this hittable.
     /// `t_min` and `t_max` are used to constrain the bounds of the "hit" so that the object

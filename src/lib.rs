@@ -4,3 +4,5 @@ pub mod material;
 pub mod hittable;
 
 extern crate num_cpus;
+
+extern crate threadpool;

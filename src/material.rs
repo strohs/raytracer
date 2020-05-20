@@ -26,7 +26,7 @@ impl ScatterRecord {
     }
 }
 
-pub trait Material {
+pub trait Material: Send + Sync {
     /// returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
     /// If this material did not scatter `r_in`, `None` is returned
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;

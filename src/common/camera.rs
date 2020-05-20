@@ -3,6 +3,7 @@ use crate::common;
 
 /// a positionable camera
 #[allow(dead_code)]
+#[derive(Debug, Copy, Clone)]
 pub struct Camera {
     vfov: f64,
     aspect_ratio: f64,

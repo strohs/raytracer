@@ -3,8 +3,7 @@ use std::io;
 use std::io::prelude::*;
 use std::io::LineWriter;
 use std::path::Path;
-use crate::common::Color;
-use crate::common::color;
+use crate::common::{Color, color};
 
 
 pub fn write(path: &Path, width: u32, height: u32, image: &[Color]) -> io::Result<()> {
@@ -23,13 +22,4 @@ pub fn write(path: &Path, width: u32, height: u32, image: &[Color]) -> io::Resul
         )?;
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    // #[test]
-    // fn gen_test_image() {
-    //     let res = generate_test_image();
-    //     assert_eq!(res, ());
-    // }
 }

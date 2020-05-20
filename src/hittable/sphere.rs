@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::common::{Point3, Ray};
 use crate::material::Material;
 use crate::hittable::{Hittable, HitRecord};
@@ -8,19 +8,19 @@ use crate::hittable::{Hittable, HitRecord};
 pub struct Sphere {
     center: Point3,
     radius: f64,
-    mat_ptr: Rc<dyn Material>,
+    mat_ptr: Arc<dyn Material>,
 }
 
 impl Sphere {
 
-    pub fn new(center: Point3, radius: f64, mat_ptr: Rc<dyn Material>) -> Self {
+    pub fn new(center: Point3, radius: f64, mat_ptr: Arc<dyn Material>) -> Self {
         Self { center, radius, mat_ptr }
     }
 
     /// convenience constructor to create a Sphere from x,y,z coordinates and a radius
     pub fn from_coords(cx: f64, cy: f64, cz: f64,
                        radius: f64,
-                       mat_ptr: Rc<dyn Material>) -> Self
+                       mat_ptr: Arc<dyn Material>) -> Self
     {
         Self {
             center: Point3::new(cx, cy, cz),
@@ -47,7 +47,7 @@ impl Hittable for Sphere {
                 r,
                 hit_point,
                 &outward_normal,
-                Rc::clone(&self.mat_ptr),
+                Arc::clone(&self.mat_ptr),
                 t)
         };
 
