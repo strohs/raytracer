@@ -1,7 +1,9 @@
-use crate::common::{Point3, Vec3, Ray};
 use crate::common;
+use crate::common::{Point3, Vec3, Ray};
+use rand::{Rng};
 
-/// a positionable camera
+/// A positionable camera with a configurable vertical field of view, aperture, focus distance,
+/// and shutter open/close time.
 #[allow(dead_code)]
 #[derive(Debug, Copy, Clone)]
 pub struct Camera {
@@ -17,21 +19,27 @@ pub struct Camera {
     u: Vec3,
     v: Vec3,
     w: Vec3,
+    open_time: f64,
+    close_time: f64,
 }
 
 impl Camera {
 
-    /// create a new `Camera` that originates from the `look_from` point, and points at the
-    /// given *look_at* point. `vup` is a Vec3 describing the camera's *up* direction, and will
-    /// allows you to rotate the camera. `vfov` is the *vertical field of view* given in **degrees**.
-    /// `aspect_ratio` is the desired *aspect ratio* for the rendered scene
+    /// create a new `Camera` originates that from the `look_from` point, and points at the `look_at` point.
+    ///`vup` is a Vec3 describing the camera's *up* direction, and allows the camera to rotate.
+    /// `vfov` is the *vertical field of view* given in **degrees**.
+    /// `aspect_ratio` is the desired *aspect ratio* for the rendered scene. `open_time` and
+    /// `close_time` are the camera's shutter open/close time, which can be used simulate
+    /// *Motion Blur* in hittables that support motion blur
     pub fn new(look_from: Point3,
                look_at: Point3,
                vup: Vec3,
                vfov: f64,
                aspect_ratio: f64,
                aperture: f64,
-               focus_dist: f64) -> Self
+               focus_dist: f64,
+               open_time: f64,
+               close_time: f64,) -> Self
     {
         let (vp_width, vp_height) = Camera::viewport_width_height(vfov, aspect_ratio);
         let w = (look_from - look_at).unit_vector();
@@ -59,12 +67,14 @@ impl Camera {
             v,
             w,
             lens_radius,
+            open_time,
+            close_time,
         }
     }
 
 
-    /// return a `Ray` that originates from this camera's origin, with a direction towards
-    /// the given `s, t` offsets
+    /// return a `Ray` that originates from this camera's origin, with its direction offset
+    /// towards the given `s, t` offsets
     pub fn get_ray(&self, s: f64, t: f64) -> Ray {
         let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rd.x() + self.v * rd.y();
@@ -73,7 +83,10 @@ impl Camera {
             + (t * self.vertical)
             - self.origin - offset;
 
-        Ray::new(self.origin + offset, direction)
+        // generate a random amount of time the camera shutter was open
+        let shutter_open: f64 = rand::thread_rng().gen_range(self.open_time, self.close_time);
+
+        Ray::new(self.origin + offset, direction, shutter_open)
     }
 
     /// Computes the viewport width and height given a vertical field of view **in degrees**

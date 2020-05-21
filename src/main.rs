@@ -8,7 +8,7 @@ fn main() {
     // aspect ratio for final image
     let aspect_ratio = 16.0 / 9.0;
     // desired image width
-    let image_width = 800;
+    let image_width = 384;
     let pool_size = num_cpus::get_physical();
 
     let (camera, world, image_width, image_height) =

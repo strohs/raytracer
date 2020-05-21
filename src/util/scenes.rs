@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere};
 use crate::material::{Lambertian, Material, Metal, Dielectric};
 use rand::Rng;
 
@@ -17,16 +17,16 @@ pub fn build_default_sphere_scene(image_width: u32, aspect_ratio: f64)
     let look_at = Point3::new(0.0, 0.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
-    let aperture = 0.1;
+    let aperture = 0.0;
     let vfov = 20.0;
     let camera = Camera::new(
-        look_from,
-        look_at,
+        look_from, look_at,
         vup,
         vfov,
         aspect_ratio,
         aperture,
-        dist_to_focus);
+        dist_to_focus,
+    0.0, 1.0);
 
     // generate a world with spheres in random locations
     let world = generate_random_spheres();
@@ -54,20 +54,30 @@ fn generate_random_spheres() -> HittableList {
                 b as f64 + 0.9 * rng.gen::<f64>());
 
             if (center - Vec3::new(4., 0.2, 0.)).length() > 0.9 {
+
                 // randomly select a material for a sphere
-                let sphere_mat: Arc<dyn Material> = match rng.gen::<f64>() {
-                    p if p < 0.8 => {
+                match rng.gen::<f64>() {
+                    prob if prob < 0.8 => {
+                        // create movingSpheres with Lambertian material
                         let albedo = Color::random() * Color::random();
-                        Arc::new(Lambertian::new(albedo))
+                        let center2 = center + Vec3::new(0., rng.gen::<f64>(), 0.);
+                        world.add(
+                            Arc::new(
+                                MovingSphere::new(
+                                    center, center2,
+                                    0.0, 1.0,
+                                    0.2,
+                                    Arc::new(Lambertian::new(albedo)))));
                     },
-                    p if p < 0.95 => {
+                    prob if prob < 0.95 => {
                         let albedo = Color::random_range(0.5, 1.0);
                         let fuzz = rng.gen_range(0.0, 0.5);
-                        Arc::new(Metal::new(albedo, fuzz))
+                        world.add(Arc::new(Sphere::new(center, 0.2, Arc::new(Metal::new(albedo, fuzz)))));
                     },
-                    _ => Arc::new(Dielectric::new(1.5)),
+                    _ => {
+                        world.add(Arc::new(Sphere::new(center, 0.2, Arc::new(Dielectric::new(1.5)))));
+                    },
                 };
-                world.add(Arc::new(Sphere::new(center, 0.2, Arc::clone(&sphere_mat))));
             }
         }
     }

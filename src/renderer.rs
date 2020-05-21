@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use std::sync::mpsc::{channel};
+use std::sync::mpsc::{Sender, channel};
 use threadpool::ThreadPool;
 use rand::{Rng};
 
@@ -35,7 +35,7 @@ pub fn render(camera: Arc<Camera>,
         // traverse the image from lower left corner to upper right and generate pixel rendering jobs
         for j in (0..image_height).rev() {
             for i in 0..image_width {
-                let tx = tx.clone();
+                let tx = Sender::clone(&tx);
                 let world = Arc::clone(&world);
                 let camera = Arc::clone(&camera);
 
@@ -58,12 +58,13 @@ pub fn render(camera: Arc<Camera>,
         let index = ((image_height - 1 - pixel_col) * image_width + pixel_row) as usize;
         image[index] = pixel_color;
     }
+
     image
 }
 
-/// determine if a Ray has hit a `hittable` object in the `world` and compute the pixel color
-/// of the `Ray`, taking into account the `Material` of the `Hittable`, performing ray bouncing
-/// (up to `MAX_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
+/// determine if a Ray has hit a `Hittable` object in the `world` and compute the pixel color
+/// of the `Ray`. The Hittable's `Material` is taken into account when performing ray bouncing
+/// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
 /// was hit, than a linearly blended "sky" color is returned
 fn ray_color(r: &Ray, world: &HittableList, depth: u32) -> Color
 {

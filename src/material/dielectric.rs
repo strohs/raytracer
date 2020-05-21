@@ -36,12 +36,12 @@ impl Material for Dielectric {
         || thread_rng().gen::<f64>() < reflect_prob {
             // ray is always reflected OR ray had a chance to reflect
             let reflected = material::reflect(&unit_direction, &rec.normal);
-            Ray::new(rec.p, reflected)
+            Ray::new(rec.p, reflected, r_in.time())
 
         } else {
             // ray is always refracted
             let refracted = material::refract(&unit_direction, &rec.normal, etai_over_etat);
-            Ray::new(rec.p, refracted)
+            Ray::new(rec.p, refracted, r_in.time())
         };
         Some(ScatterRecord::new(attenuation, scattered_ray))
 

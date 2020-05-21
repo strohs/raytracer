@@ -1,6 +1,9 @@
 pub mod sphere;
 pub use sphere::*;
 
+pub mod moving_sphere;
+pub use moving_sphere::*;
+
 pub mod hit_record;
 pub use hit_record::*;
 

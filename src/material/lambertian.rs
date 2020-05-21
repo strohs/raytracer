@@ -17,11 +17,11 @@ impl Lambertian {
 
 impl Material for Lambertian {
 
-    fn scatter(&self, _r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
+    fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord> {
         let scatter_direction = rec.normal + Vec3::random_unit_vector();
         Some(
             ScatterRecord {
-                scattered: Ray::new(rec.p, scatter_direction),
+                scattered: Ray::new(rec.p, scatter_direction, r_in.time()),
                 attenuation: self.albedo,
             }
         )

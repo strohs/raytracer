@@ -5,15 +5,17 @@ use crate::common::{Vec3, Point3};
 pub struct Ray {
     orig: Point3,
     dir: Vec3,
+    time: f64,
 }
 
 impl Ray {
 
-    /// construct a new Ray with the given origin and direction
-    pub fn new(origin: Point3, direction: Vec3) -> Self {
+    /// construct a new Ray with the given `origin`, `direction`, and `time`
+    pub fn new(origin: Point3, direction: Vec3, time: f64) -> Self {
         Self {
             orig: origin,
             dir: direction,
+            time: time,
         }
     }
 
@@ -27,12 +29,16 @@ impl Ray {
         self.dir
     }
 
+    /// return the time this ray existed at
+    pub fn time(&self) -> f64 {
+        self.time
+    }
+
     /// return the point, on this Ray, **at** the "ray parameter" `t`
     /// P(t) = A + tb
     pub fn at(&self, t: f64) -> Point3 {
         self.orig + t * self.dir
     }
-
 
 }
 
@@ -52,7 +58,8 @@ mod tests {
     fn ray_origin() {
         let ray = Ray::new(
             Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0)
+            Vec3::new(4.0, 5.0, 6.0),
+            1.0
         );
         assert_eq!(ray.origin(), Point3::new(1.0, 2.0, 3.0));
     }
@@ -61,7 +68,8 @@ mod tests {
     fn ray_direction() {
         let ray = Ray::new(
             Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0)
+            Vec3::new(4.0, 5.0, 6.0),
+            1.0
         );
         assert_eq!(ray.direction(), Vec3::new(4.0, 5.0, 6.0));
     }
@@ -71,7 +79,8 @@ mod tests {
         let t = 2.0;
         let ray = Ray::new(
             Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0)
+            Vec3::new(4.0, 5.0, 6.0),
+            1.0
         );
         let point_at = ray.at(t);
         assert_eq!(point_at, Point3::new(9.0, 12.0, 15.0));
