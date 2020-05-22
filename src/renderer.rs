@@ -4,7 +4,7 @@ use threadpool::ThreadPool;
 use rand::{Rng};
 
 use crate::common::{Ray, Color, Camera, color};
-use crate::hittable::HittableList;
+use crate::hittable::{Hittable};
 
 // max recursion depth allowed when bouncing rays of hittables
 const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
@@ -21,7 +21,7 @@ const MAX_SAMPLES_PER_PIXEL: u32 = 100;
 /// a Vec of `Color` where each Color represents a pixel color. The image is returned in reverse
 /// row order, meaning the bottom rows of the image appear first in the Vec
 pub fn render(camera: Arc<Camera>,
-              world: Arc<HittableList>,
+              world: Arc<dyn Hittable>,
               num_workers: usize,
               image_width: u32,
               image_height: u32) -> Vec<Color>
@@ -40,7 +40,7 @@ pub fn render(camera: Arc<Camera>,
                 let camera = Arc::clone(&camera);
 
                 pool.execute(move || {
-                    let pixel_color = multi_sample_pixel(i, j, &camera, &world, image_width, image_height);
+                    let pixel_color = multi_sample_pixel(i, j, &camera, &*world, image_width, image_height);
                     tx.send((i, j, pixel_color)).expect("error occurred rendering pixel");
                 });
             }
@@ -66,12 +66,12 @@ pub fn render(camera: Arc<Camera>,
 /// of the `Ray`. The Hittable's `Material` is taken into account when performing ray bouncing
 /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
 /// was hit, than a linearly blended "sky" color is returned
-fn ray_color(r: &Ray, world: &HittableList, depth: u32) -> Color
+fn ray_color<T: Hittable + ?Sized>(r: &Ray, world: &T, depth: u32) -> Color
 {
     // exceeded the ray bounce limit, no more light is gathered
     if depth == 0 {
         Color::default()
-    } else if let Some(ref rec) = world.check_for_hits(r, 0.001, f64::INFINITY) {
+    } else if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
         if let Some(scatter_rec) = rec.mat_ptr.scatter(r, rec) {
             scatter_rec.attenuation * ray_color(&scatter_rec.scattered, world, depth - 1)
         } else {
@@ -90,10 +90,10 @@ fn ray_color(r: &Ray, world: &HittableList, depth: u32) -> Color
 
 /// determine the color of the specified pixel using multisampling. `pw,ph` are the width and
 /// height of the pixel in the image
-fn multi_sample_pixel(pw: u32,
+fn multi_sample_pixel<T: Hittable + ?Sized>(pw: u32,
                       ph: u32,
                       camera: &Camera,
-                      world: &HittableList,
+                      world: &T,
                       image_width: u32,
                       image_height: u32) -> Color
 {
@@ -107,7 +107,7 @@ fn multi_sample_pixel(pw: u32,
 
         let r: Ray = camera.get_ray(u, v);
 
-        pixel_color += ray_color(&r, &world, MAX_RAY_BOUNCE_DEPTH);
+        pixel_color += ray_color(&r, world, MAX_RAY_BOUNCE_DEPTH);
     }
 
 

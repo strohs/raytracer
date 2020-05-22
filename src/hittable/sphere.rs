@@ -1,7 +1,7 @@
 use std::sync::Arc;
-use crate::common::{Point3, Ray};
+use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
-use crate::hittable::{Hittable, HitRecord};
+use crate::hittable::{Hittable, HitRecord, Aabb};
 
 
 /// a 3D sphere "object" with a `center` and `radius`
@@ -71,5 +71,34 @@ impl Hittable for Sphere {
         }
         // ray did not hit this Sphere
         None
+    }
+
+    /// returns a bounding box for this sphere
+    fn bounding_box(&self, _t0: f64, _t1: f64) -> Option<Aabb> {
+        Some(Aabb::new(
+            self.center() - Vec3::new(self.radius(), self.radius(), self.radius()),
+            self.center() + Vec3::new(self.radius(), self.radius(), self.radius())
+        ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::hittable::{Sphere, Hittable};
+    use crate::common::{Point3, Color};
+    use crate::material::Lambertian;
+    use std::sync::Arc;
+
+    #[test]
+    fn has_a_bounding_box_of_min_0_and_max_2() {
+        // create a test sphere located at 1,1,1  with a radius of 1
+        let material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, material);
+
+        let aabb = sphere.bounding_box(1.0, 1.0);
+
+        assert!(aabb.is_some());
+        assert_eq!(aabb.unwrap().min(), Point3::new(0.0, 0.0, 0.0));
+        assert_eq!(aabb.unwrap().max(), Point3::new(2.0, 2.0, 2.0));
     }
 }

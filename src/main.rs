@@ -13,7 +13,7 @@ fn main() {
 
     let (camera, world, image_width, image_height) =
         scenes::build_default_sphere_scene(image_width, aspect_ratio);
-
+    
     let now = Instant::now();
     println!("rendering {}x{} image...", &image_width, &image_height);
     let image = renderer::render(

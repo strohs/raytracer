@@ -1,7 +1,7 @@
-use crate::common::{Point3, Ray};
+use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
 use std::sync::Arc;
-use crate::hittable::{Hittable, HitRecord};
+use crate::hittable::{Hittable, HitRecord, Aabb};
 
 /// a sphere that has its center move linearly from `center0` at `time0` to `center1` at `time1`.
 /// After that time interval, it continues on, so the times do not need to match up with the
@@ -38,6 +38,11 @@ impl MovingSphere {
         self.center0
             + ((time - self.time0) / (self.time1 - self.time0))
             * (self.center1 - self.center0)
+    }
+
+    /// Returns the radius of this Sphere
+    pub fn radius(&self) -> f64 {
+        self.radius
     }
 }
 
@@ -76,5 +81,19 @@ impl Hittable for MovingSphere {
         }
         // ray did not hit this Sphere
         None
+    }
+
+    /// Returns a bounding box for this sphere.
+    /// Rake the box of the sphere at t0, and the box of the sphere at t1, and compute the
+    /// box of those two boxes
+    fn bounding_box(&self, t0: f64, t1: f64) -> Option<Aabb> {
+        let box0 = Aabb::new(
+            self.center(t0) - Vec3::new(self.radius(), self.radius(), self.radius()),
+            self.center(t0) + Vec3::new(self.radius(), self.radius(), self.radius()));
+        let box1 = Aabb::new(
+            self.center(t1) - Vec3::new(self.radius(), self.radius(), self.radius()),
+            self.center(t1) + Vec3::new(self.radius(), self.radius(), self.radius()));
+
+        Some(Aabb::surrounding_box(&box0, &box1))
     }
 }
