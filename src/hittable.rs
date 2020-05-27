@@ -7,6 +7,9 @@ pub use moving_sphere::*;
 pub mod aabb;
 pub use aabb::*;
 
+pub mod bvh_node;
+pub use bvh_node::*;
+
 pub mod hit_record;
 pub use hit_record::*;
 
@@ -23,6 +26,7 @@ pub trait Hittable: Send + Sync {
     ///hit must be between `t_min and t_max`. If the Ray did not hit then `None` is returned
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 
+    // TODO see if you can give return Option<&Aabb>
     /// Computes and returns the axis-aligned bounding box `Aabb` of this hittable
     fn bounding_box(&self, t0: f64, t1: f64) -> Option<Aabb>;
 }

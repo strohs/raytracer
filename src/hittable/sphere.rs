@@ -39,7 +39,7 @@ impl Sphere {
 impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
 
-        // convenience closure that builds a new HitRecord based on the Ray
+        // helper closure that builds a new HitRecord
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center) / self.radius;

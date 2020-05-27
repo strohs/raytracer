@@ -2,7 +2,7 @@ use std::sync::Arc;
 use crate::common::{Point3, Vec3, Ray};
 use crate::material::Material;
 
-/// holds a 'record' containing the detials of where a Ray "hit" a "hittable" object
+/// holds a 'record' containing the details of where a Ray "hit" a "hittable" object
 pub struct HitRecord {
     // point on the hittable that was hit by a ray
     pub p: Point3,

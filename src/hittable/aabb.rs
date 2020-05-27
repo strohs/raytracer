@@ -15,7 +15,8 @@ impl Default for Aabb {
         let max = Point3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
 
         Self {
-            min, max
+            min,
+            max
         }
     }
 }

@@ -36,6 +36,9 @@ impl HittableList {
     }
 
 
+    pub fn objects(&mut self) -> &mut Vec<Arc<dyn Hittable>> {
+        &mut self.objects
+    }
 }
 
 impl Hittable for HittableList {

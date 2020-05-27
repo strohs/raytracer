@@ -12,7 +12,7 @@ const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
 const MAX_SAMPLES_PER_PIXEL: u32 = 100;
 
 
-/// render an image using the provided `Camera` and `World`. `num_workers` is the number of
+/// Renders an image using the provided `Camera` and `World`. `num_workers` is the number of
 /// **os threads** to use for rendering, this should be set to the number of physical or logical
 /// cores on the machine you are rendering on.
 /// `image_width`, `image_height` is the desired width/height of the final image.
