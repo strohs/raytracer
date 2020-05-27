@@ -2,6 +2,7 @@ use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
 use std::sync::Arc;
 use crate::hittable::{Hittable, HitRecord, Aabb};
+use std::fmt::Formatter;
 
 /// a sphere that has its center move linearly from `center0` at `time0` to `center1` at `time1`.
 /// After that time interval, it continues on, so the times do not need to match up with the
@@ -95,5 +96,19 @@ impl Hittable for MovingSphere {
             self.center(t1) + Vec3::new(self.radius(), self.radius(), self.radius()));
 
         Some(Aabb::surrounding_box(&box0, &box1))
+    }
+}
+
+impl std::fmt::Debug for MovingSphere {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+
+        f.debug_struct("Sphere")
+            .field("center0", &self.center0)
+            .field("center1", &self.center1)
+            .field("time0", &self.time0)
+            .field("time1", &self.time1)
+            .field("radius", &self.radius)
+            .field("material", &self.mat_ptr)
+            .finish()
     }
 }

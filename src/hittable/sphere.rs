@@ -2,6 +2,7 @@ use std::sync::Arc;
 use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
 use crate::hittable::{Hittable, HitRecord, Aabb};
+use std::fmt::{Formatter};
 
 
 /// a 3D sphere "object" with a `center` and `radius`
@@ -37,6 +38,7 @@ impl Sphere {
 }
 
 impl Hittable for Sphere {
+
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
 
         // helper closure that builds a new HitRecord
@@ -82,6 +84,17 @@ impl Hittable for Sphere {
     }
 }
 
+impl std::fmt::Debug for Sphere {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        
+        f.debug_struct("Sphere")
+            .field("center", &self.center)
+            .field("radius", &self.radius)
+            .field("material", &self.mat_ptr)
+            .finish()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::hittable::{Sphere, Hittable};
@@ -100,5 +113,12 @@ mod tests {
         assert!(aabb.is_some());
         assert_eq!(aabb.unwrap().min(), Point3::new(0.0, 0.0, 0.0));
         assert_eq!(aabb.unwrap().max(), Point3::new(2.0, 2.0, 2.0));
+    }
+
+    #[test]
+    fn should_print_debug() {
+        let material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, material);
+        println!("{:#?}", sphere);
     }
 }

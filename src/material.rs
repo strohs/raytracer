@@ -10,6 +10,7 @@ pub use dielectric::*;
 use crate::common::{Ray, Color, Vec3};
 use crate::hittable::HitRecord;
 use std::ops::Neg;
+use std::fmt::Debug;
 
 /// holds the details on how a `Material` scattered an incoming `Ray`.
 /// `attenuation` field what `Color` was applied by the material to the incoming Ray
@@ -26,7 +27,7 @@ impl ScatterRecord {
     }
 }
 
-pub trait Material: Send + Sync {
+pub trait Material: Send + Sync + Debug {
     /// returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
     /// If this material did not scatter `r_in`, `None` is returned
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;

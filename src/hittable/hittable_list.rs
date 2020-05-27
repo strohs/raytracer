@@ -4,6 +4,7 @@ use crate::common::Ray;
 
 use super::{HitRecord, Hittable};
 use crate::hittable::Aabb;
+use std::fmt::Formatter;
 
 /// a list of all Hittable objects in the ray tracer's "world" (a.k.a scene)
 pub struct HittableList {
@@ -67,7 +68,7 @@ impl Hittable for HittableList {
             return None;
         }
 
-        // this will compute a surrounding bounding box for all Hittables that return a AABB,
+        // this will compute a surrounding bounding box for all Hittables that return an AABB,
         // AABB's that return None are filtered out
         let output_box = self.objects
             .iter()
@@ -95,6 +96,14 @@ impl Hittable for HittableList {
         //     }
         // }
         Some(output_box)
+    }
+}
+
+impl std::fmt::Debug for HittableList {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("HittableList")
+            .field("objects", &self.objects)
+            .finish()
     }
 }
 
