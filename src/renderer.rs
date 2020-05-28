@@ -4,7 +4,7 @@ use threadpool::ThreadPool;
 use rand::{Rng};
 
 use crate::common::{Ray, Color, Camera, color};
-use crate::hittable::{Hittable};
+use crate::hittable::{Hittable, BvhNode, HittableList};
 
 // max recursion depth allowed when bouncing rays of hittables
 const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
@@ -20,14 +20,18 @@ const MAX_SAMPLES_PER_PIXEL: u32 = 100;
 /// # Returns
 /// a Vec of `Color` where each Color represents a pixel color. The image is returned in reverse
 /// row order, meaning the bottom rows of the image appear first in the Vec
-pub fn render(camera: Arc<Camera>,
-              world: Arc<dyn Hittable>,
+pub fn render(camera: Camera,
+              mut world: HittableList,
               num_workers: usize,
               image_width: u32,
               image_height: u32) -> Vec<Color>
 {
     // build a thread pool to render a pixel color per thread
     let pool = ThreadPool::new(num_workers);
+    
+    // build the Bounded Volume Hierarchy
+    let bvh: Arc<dyn Hittable> = Arc::new(BvhNode::from(&mut world, 0.0, 1.0));
+    let camera = Arc::new(camera);
 
     let rx = {
         let (tx, rx) = channel();
@@ -36,7 +40,7 @@ pub fn render(camera: Arc<Camera>,
         for j in (0..image_height).rev() {
             for i in 0..image_width {
                 let tx = Sender::clone(&tx);
-                let world = Arc::clone(&world);
+                let world = Arc::clone(&bvh);
                 let camera = Arc::clone(&camera);
 
                 pool.execute(move || {
