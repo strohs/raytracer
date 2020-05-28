@@ -70,7 +70,10 @@ pub fn render(camera: Camera,
 /// of the `Ray`. The Hittable's `Material` is taken into account when performing ray bouncing
 /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
 /// was hit, than a linearly blended "sky" color is returned
-fn ray_color<T: Hittable + ?Sized>(r: &Ray, world: &T, depth: u32) -> Color
+fn ray_color<T: Hittable + ?Sized>(
+    r: &Ray,
+    world: &T,
+    depth: u32) -> Color
 {
     // exceeded the ray bounce limit, no more light is gathered
     if depth == 0 {
@@ -92,14 +95,15 @@ fn ray_color<T: Hittable + ?Sized>(r: &Ray, world: &T, depth: u32) -> Color
     }
 }
 
-/// determine the color of the specified pixel using multisampling. `pw,ph` are the width and
-/// height of the pixel in the image
-fn multi_sample_pixel<T: Hittable + ?Sized>(pw: u32,
-                      ph: u32,
-                      camera: &Camera,
-                      world: &T,
-                      image_width: u32,
-                      image_height: u32) -> Color
+/// Computes the color of the pixel located at `pw,ph` (pixel width, pixel height) by sampling
+/// the pixels around it.
+fn multi_sample_pixel<T: Hittable + ?Sized>(
+    pw: u32,
+    ph: u32,
+    camera: &Camera,
+    world: &T,
+    image_width: u32,
+    image_height: u32) -> Color
 {
     let mut rng = rand::thread_rng();
     let mut pixel_color = Color::default();
@@ -113,7 +117,6 @@ fn multi_sample_pixel<T: Hittable + ?Sized>(pw: u32,
 
         pixel_color += ray_color(&r, world, MAX_RAY_BOUNCE_DEPTH);
     }
-
 
     color::multi_sample(pixel_color, MAX_SAMPLES_PER_PIXEL)
 }
