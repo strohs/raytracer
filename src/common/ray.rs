@@ -19,22 +19,22 @@ impl Ray {
         }
     }
 
-    /// return a copy of this Ray's origin field
+    /// returns a copy of this Ray's origin field
     pub fn origin(&self) -> Point3 {
         self.orig
     }
 
-    /// return a copy of this Ray's direction field
+    /// returns a copy of this Ray's direction field
     pub fn direction(&self) -> Vec3 {
         self.dir
     }
 
-    /// return the time this ray existed at
+    /// returns the time this ray existed at
     pub fn time(&self) -> f64 {
         self.time
     }
 
-    /// return the point, on this Ray, **at** the "ray parameter" `t`
+    /// returns the point, on this Ray, **at** the "ray parameter" `t`
     /// P(t) = A + tb
     pub fn at(&self, t: f64) -> Point3 {
         self.orig + t * self.dir

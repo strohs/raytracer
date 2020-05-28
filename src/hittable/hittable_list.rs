@@ -31,7 +31,7 @@ impl HittableList {
         self.objects.clear();
     }
 
-    /// add a hittable object to the hittable list
+    /// Adds a `Hittable` to this HittableList
     pub fn add(&mut self, object: Arc<dyn Hittable>) {
         self.objects.push(object);
     }
@@ -113,10 +113,12 @@ mod tests {
     use crate::material::{Lambertian, Material};
     use crate::common::{Color, Point3};
     use crate::hittable::{Sphere, HittableList, Hittable};
+    use crate::texture::SolidColor;
 
     #[test]
     fn should_return_a_surrounding_bounding_box_with_min0_max3() {
-        let material: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&material));
         let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&material));
         let mut hit_list = HittableList::new();

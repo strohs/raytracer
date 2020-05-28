@@ -1,11 +1,12 @@
 use std::sync::Arc;
 use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
+use crate::texture;
 use crate::hittable::{Hittable, HitRecord, Aabb};
 use std::fmt::{Formatter};
 
 
-/// a 3D sphere "object" with a `center` and `radius`
+/// a 3D sphere "primitive" with a `center` and `radius`
 pub struct Sphere {
     center: Point3,
     radius: f64,
@@ -45,12 +46,15 @@ impl Hittable for Sphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center) / self.radius;
+            let (u,v) = texture::get_sphere_uv(&r.at(t));
             HitRecord::with_face_normal(
                 r,
                 hit_point,
                 &outward_normal,
                 Arc::clone(&self.mat_ptr),
-                t)
+                t,
+                u,
+                v)
         };
 
         let oc = r.origin() - self.center;
@@ -99,14 +103,16 @@ impl std::fmt::Debug for Sphere {
 mod tests {
     use crate::hittable::{Sphere, Hittable};
     use crate::common::{Point3, Color};
-    use crate::material::Lambertian;
+    use crate::material::{Lambertian, Material};
     use std::sync::Arc;
+    use crate::texture::SolidColor;
 
     #[test]
     fn has_a_bounding_box_of_min_0_and_max_2() {
         // create a test sphere located at 1,1,1  with a radius of 1
-        let material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, material);
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
+        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, lamb_mat);
 
         let aabb = sphere.bounding_box(1.0, 1.0);
 
@@ -117,8 +123,9 @@ mod tests {
 
     #[test]
     fn should_print_debug() {
-        let material = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
-        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, material);
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
+        let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, lamb_mat);
         println!("{:#?}", sphere);
     }
 }

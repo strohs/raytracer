@@ -3,6 +3,7 @@ use crate::material::Material;
 use std::sync::Arc;
 use crate::hittable::{Hittable, HitRecord, Aabb};
 use std::fmt::Formatter;
+use crate::texture;
 
 /// a sphere that has its center move linearly from `center0` at `time0` to `center1` at `time1`.
 /// After that time interval, it continues on, so the times do not need to match up with the
@@ -53,12 +54,14 @@ impl Hittable for MovingSphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center(r.time())) / self.radius;
+            let (u,v) = texture::get_sphere_uv(&r.at(t));
             HitRecord::with_face_normal(
                 r,
                 hit_point,
                 &outward_normal,
                 Arc::clone(&self.mat_ptr),
-                t)
+                t,
+                u,v)
         };
 
         // this sphere center at the the Ray's time

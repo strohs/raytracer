@@ -174,10 +174,12 @@ mod tests {
     use crate::common::{Color, Point3};
     use crate::hittable::{Sphere, BvhNode, HittableList};
     use std::cmp::Ordering;
+    use crate::texture::SolidColor;
 
     #[test]
     fn box_compare_sphere1_x_axis_lt_sphere2() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
@@ -186,7 +188,8 @@ mod tests {
 
     #[test]
     fn box_compare_sphere1_y_axis_lt_sphere2() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
@@ -195,7 +198,8 @@ mod tests {
 
     #[test]
     fn box_compare_sphere1_z_axis_lt_sphere2() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
@@ -204,7 +208,8 @@ mod tests {
 
     #[test]
     fn box_compare_sphere1_xaxis_to_sphere2_should_be_eq() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(1.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
@@ -213,7 +218,8 @@ mod tests {
 
     #[test]
     fn box_compare_sphere1_xaxis_gt_sphere2() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(2.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(1.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
@@ -222,7 +228,8 @@ mod tests {
 
     #[test]
     fn debug_bvh_node() {
-        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere1 = Sphere::new(Point3::new(7.0, 0.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(5.0, 0.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere3 = Sphere::new(Point3::new(3.0, 0.0, 1.0), 1.0, Arc::clone(&lamb_mat));

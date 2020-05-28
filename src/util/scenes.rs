@@ -3,11 +3,12 @@ use crate::common::{Color, Point3, Vec3, Camera};
 use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere};
 use crate::material::{Lambertian, Material, Metal, Dielectric};
 use rand::Rng;
+use crate::texture::{Texture, SolidColor, Checker};
 
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
-/// 3 bigger spheres. These are then positioned on top of an enormous sphere, which acts as the
-/// ground plane
-pub fn build_default_sphere_scene(image_width: u32, aspect_ratio: f64)
+/// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
+/// texture, which acts as the ground plane
+pub fn build_random_sphere_scene(image_width: u32, aspect_ratio: f64)
     -> (Camera, HittableList, u32, u32)
 {
     let image_height = (image_width as f64 / aspect_ratio) as u32;
@@ -34,14 +35,18 @@ pub fn build_default_sphere_scene(image_width: u32, aspect_ratio: f64)
     (camera, world, image_width, image_height)
 }
 
-/// generates a random "world" containing 484 spheres of various colors and materials
+/// generates a random "world" containing 484 spheres of various colors and materials on top of
+/// a gigantic checkerboard sphere
 fn generate_random_spheres() -> HittableList {
     let mut rng = rand::thread_rng();
 
     let mut world = HittableList::new();
 
     // a big, Lambertian grey, sphere that will act at the ground
-    let ground_material: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(0.5, 0.5, 0.5)));
+    let checker_tex: Arc<dyn Texture> = Arc::new(Checker::from(
+        Arc::new(SolidColor::from_rgb(0.2, 0.3, 0.1)),
+        Arc::new(SolidColor::from_rgb(0.9, 0.9, 0.9))));
+    let ground_material: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&checker_tex)));
     let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_material);
     world.add(Arc::new(ground_sphere));
 
@@ -56,10 +61,10 @@ fn generate_random_spheres() -> HittableList {
             if (center - Vec3::new(4., 0.2, 0.)).length() > 0.9 {
 
                 // randomly select a material for a sphere
-                match rng.gen::<f64>() {
-                    prob if prob < 0.8 => {
+                let prob = rng.gen::<f64>();
+                if prob < 0.1 {
                         // create movingSpheres with Lambertian material
-                        let albedo = Color::random() * Color::random();
+                        let albedo: Arc<dyn Texture> = Arc::new(SolidColor::from(Color::random() * Color::random()));
                         let center2 = center + Vec3::new(0., rng.gen::<f64>(), 0.);
                         world.add(
                             Arc::new(
@@ -67,17 +72,21 @@ fn generate_random_spheres() -> HittableList {
                                     center, center2,
                                     0.0, 1.0,
                                     0.2,
-                                    Arc::new(Lambertian::new(albedo)))));
-                    },
-                    prob if prob < 0.95 => {
+                                    Arc::new(Lambertian::new(Arc::clone(&albedo))))));
+                } else if prob < 0.7 {
+                    // create a solid color, Lambertian sphere
+                    let solid_tex: Arc<dyn Texture> = Arc::new(SolidColor::from(Color::random() * Color::random()));
+                    let center = center + Vec3::new(0., rng.gen::<f64>(), 0.);
+                    let mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&solid_tex)));
+                    let sphere = Sphere::new(center, 0.2, mat);
+                    world.add(Arc::new(sphere));
+                } else if prob < 0.95 {
                         let albedo = Color::random_range(0.5, 1.0);
                         let fuzz = rng.gen_range(0.0, 0.5);
                         world.add(Arc::new(Sphere::new(center, 0.2, Arc::new(Metal::new(albedo, fuzz)))));
-                    },
-                    _ => {
+                } else {
                         world.add(Arc::new(Sphere::new(center, 0.2, Arc::new(Dielectric::new(1.5)))));
-                    },
-                };
+                }
             }
         }
     }
@@ -88,7 +97,8 @@ fn generate_random_spheres() -> HittableList {
     world.add(sphere1);
 
     // add a single, lambertian reddish colored sphere
-    let mat2: Arc<dyn Material> = Arc::new(Lambertian::new(Color::new(1.0, 0.1, 0.1)));
+    let tex2: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(1.0, 0.1, 0.1));
+    let mat2: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&tex2)));
     let sphere2: Arc<dyn Hittable> = Arc::new(Sphere::new(Point3::new(-4., 1., 0.), 1.0, Arc::clone(&mat2)));
     world.add(sphere2);
 

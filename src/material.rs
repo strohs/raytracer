@@ -27,13 +27,17 @@ impl ScatterRecord {
     }
 }
 
+
+
+
 pub trait Material: Send + Sync + Debug {
+
     /// returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
     /// If this material did not scatter `r_in`, `None` is returned
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;
 }
 
-/// returns a reflected `Vec3` between `v` and `n`, where `n` is a unit vector
+/// Returns a *reflected* `Vec3` between `v` and `n`, where `n` is a unit vector
 fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
     *v - *n * (2.0 * v.dot(n))
 }

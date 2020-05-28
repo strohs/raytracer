@@ -16,6 +16,12 @@ pub struct HitRecord {
     // position along the ray that hit the point, `p`
     pub t: f64,
 
+    // texture u coordinate
+    pub u: f64,
+
+    // texture v coordinate
+    pub v: f64,
+
     // true if ray hit a front face of a hittable (ray hit from outside the hittable),
     // false if a ray hit a backward face of a 'hittable' (ray hit from the inside of a hittable)
     pub front_face: bool,
@@ -28,6 +34,8 @@ impl HitRecord {
                normal: Vec3,
                mat_ptr: Arc<dyn Material>,
                t: f64,
+               u: f64,
+               v: f64,
                front_face: bool) -> Self
     {
         Self {
@@ -35,6 +43,8 @@ impl HitRecord {
             normal,
             mat_ptr,
             t,
+            u,
+            v,
             front_face,
         }
     }
@@ -50,7 +60,9 @@ impl HitRecord {
                             p: Point3,
                             outward_normal: &Vec3,
                             mat_ptr: Arc<dyn Material>,
-                            t: f64) -> Self
+                            t: f64,
+                            u: f64,
+                            v: f64,) -> Self
     {
         let front_face = HitRecord::hit_front_face(r, outward_normal);
         let normal = if front_face {
@@ -58,7 +70,7 @@ impl HitRecord {
         } else {
             -*outward_normal
         };
-        HitRecord::new(p, normal, mat_ptr, t, front_face)
+        HitRecord::new(p, normal, mat_ptr, t, u, v, front_face)
     }
 
     /// returns true if the given ray has "hit" a front face of a Hittable, returns false
