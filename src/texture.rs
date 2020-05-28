@@ -4,6 +4,12 @@ pub use solid::*;
 pub mod checker;
 pub use checker::*;
 
+pub mod perlin;
+pub use perlin::*;
+
+pub mod noise;
+pub use noise::*;
+
 use crate::common::{Color, Point3, Vec3};
 use std::f64::consts::PI;
 

@@ -13,12 +13,12 @@ fn main() {
     // number of worker threads to spin up
     let pool_size = num_cpus::get_physical();
 
-    // build a the ca random sphere scene
-    let (camera, world, image_width, image_height) =
-        scenes::build_random_sphere_scene(image_width, aspect_ratio);
-
+    // build the random "spheres on sphere" scene
     // let (camera, world, image_width, image_height) =
-    //     scenes::build_two_checkered_spheres(image_width, aspect_ratio);
+    //     scenes::build_random_sphere_scene(image_width, aspect_ratio);
+
+    let (camera, world, image_width, image_height) =
+        scenes::build_two_perlin_spheres(image_width, aspect_ratio);
     
     let now = Instant::now();
     println!("rendering {}x{} image...", &image_width, &image_height);

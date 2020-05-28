@@ -3,7 +3,7 @@ use crate::common::{Color, Point3, Vec3, Camera};
 use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere};
 use crate::material::{Lambertian, Material, Metal, Dielectric};
 use rand::Rng;
-use crate::texture::{Texture, SolidColor, Checker};
+use crate::texture::{Texture, SolidColor, Checker, Perlin, Noise};
 
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
 /// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
@@ -110,7 +110,7 @@ fn generate_random_spheres() -> HittableList {
     world
 }
 
-/// builds a scend with two checkered spheres on top of each other
+/// builds a scene with two checkered spheres on top of each other
 pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
     -> (Camera, HittableList, u32, u32)
 {
@@ -140,6 +140,41 @@ pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
     let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&check_tex)));
     let sphere1 = Sphere::new(Point3::new(0., -10., 0.), 10., Arc::clone(&lamb));
     let sphere2 = Sphere::new(Point3::new(0., 10., 0.), 10., Arc::clone(&lamb));
+
+    let mut world = HittableList::new();
+    world.add(Arc::new(sphere1));
+    world.add(Arc::new(sphere2));
+
+    (camera, world, image_width, image_height)
+}
+
+/// builds a scene with two checkered spheres on top of each other
+pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
+                                   -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 20.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // generate two checkered spheres
+    let perlin_tex: Arc<dyn Texture> = Arc::new(Noise::new(Perlin::new(), 5.));
+    let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&perlin_tex)));
+    let sphere1 = Sphere::new(Point3::new(0., -1000., 0.), 1000., Arc::clone(&lamb));
+    let sphere2 = Sphere::new(Point3::new(0., 2., 0.), 2., Arc::clone(&lamb));
 
     let mut world = HittableList::new();
     world.add(Arc::new(sphere1));
