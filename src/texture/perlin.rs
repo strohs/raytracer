@@ -5,7 +5,8 @@ use std::fmt::Formatter;
 
 const POINT_COUNT: usize = 256;
 
-/// Generates Perlin noise via a call to the `perlin_noise(p: Point3)` method of this struct
+/// A helper struct that can be used to generate Perlin noise via a call to the
+/// `perlin_noise(p: Point3)` method of this struct
 pub struct Perlin {
     perm_x: [i32; POINT_COUNT],
     perm_y: [i32; POINT_COUNT],
@@ -61,7 +62,7 @@ impl Perlin {
         perlin_interp(&c, u, v, w)
     }
 
-    /// Generates turbulence on a texture via repeated calls to `Perlin.perlin_noise()`
+    /// Generates turbulence on a texture via repeated calls to `perlin_noise()`.
     /// `depth` controls the number of times to call perlin_noise()
     pub fn turb(&self, p: &Point3, depth: usize) -> f64 {
         let mut accum: f64 = 0.0;

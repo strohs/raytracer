@@ -46,7 +46,7 @@ impl Hittable for Sphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center) / self.radius;
-            let (u,v) = texture::get_sphere_uv(&r.at(t));
+            let (u,v) = texture::get_sphere_uv(&outward_normal);
             HitRecord::with_face_normal(
                 r,
                 hit_point,
@@ -102,15 +102,15 @@ impl std::fmt::Debug for Sphere {
 #[cfg(test)]
 mod tests {
     use crate::hittable::{Sphere, Hittable};
-    use crate::common::{Point3, Color};
+    use crate::common::{Point3};
     use crate::material::{Lambertian, Material};
     use std::sync::Arc;
-    use crate::texture::SolidColor;
+    use crate::texture::{SolidColor, Texture};
 
     #[test]
     fn has_a_bounding_box_of_min_0_and_max_2() {
         // create a test sphere located at 1,1,1  with a radius of 1
-        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
         let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, lamb_mat);
 
@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn should_print_debug() {
-        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
         let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
         let sphere = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, lamb_mat);
         println!("{:#?}", sphere);

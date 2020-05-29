@@ -54,7 +54,7 @@ impl Hittable for MovingSphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center(r.time())) / self.radius;
-            let (u,v) = texture::get_sphere_uv(&r.at(t));
+            let (u,v) = texture::get_sphere_uv(&outward_normal);
             HitRecord::with_face_normal(
                 r,
                 hit_point,

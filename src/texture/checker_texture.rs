@@ -10,12 +10,12 @@ use crate::common::{Point3, Color};
 /// alternates in a regular way. If we multiply trig functions in all three dimensions, the sign
 /// of that product forms a 3D checker pattern
 #[derive(Debug)]
-pub struct Checker {
+pub struct CheckerTexture {
     odd: Arc<dyn Texture>,
     even: Arc<dyn Texture>,
 }
 
-impl Checker {
+impl CheckerTexture {
 
     /// Returns a "Checker" texture from an `odd` and `even` Texture that are used to generate
     /// the checkerboard pattern
@@ -27,7 +27,7 @@ impl Checker {
     }
 }
 
-impl Texture for Checker {
+impl Texture for CheckerTexture {
 
     /// Returns the checkerboard `Color` at the given `u, v` coordinate and point `p`
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color {

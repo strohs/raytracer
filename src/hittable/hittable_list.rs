@@ -111,16 +111,16 @@ impl std::fmt::Debug for HittableList {
 mod tests {
     use std::sync::Arc;
     use crate::material::{Lambertian, Material};
-    use crate::common::{Color, Point3};
+    use crate::common::{Point3};
     use crate::hittable::{Sphere, HittableList, Hittable};
-    use crate::texture::SolidColor;
+    use crate::texture::{SolidColor, Texture};
 
     #[test]
     fn should_return_a_surrounding_bounding_box_with_min0_max3() {
-        let tex: Arc<dyn Material> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
+        let tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.5, 0.5, 0.5));
         let lamb_mat: Arc<dyn Material> = Arc::new(Lambertian::new(tex));
-        let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&material));
-        let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&material));
+        let sphere1 = Sphere::new(Point3::new(1.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
+        let sphere2 = Sphere::new(Point3::new(2.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
         let mut hit_list = HittableList::new();
         hit_list.add(Arc::new(sphere1));
         hit_list.add(Arc::new(sphere2));

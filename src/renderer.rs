@@ -118,5 +118,5 @@ fn multi_sample_pixel<T: Hittable + ?Sized>(
         pixel_color += ray_color(&r, world, MAX_RAY_BOUNCE_DEPTH);
     }
 
-    color::multi_sample(pixel_color, MAX_SAMPLES_PER_PIXEL)
+    color::multi_sample(&pixel_color, MAX_SAMPLES_PER_PIXEL)
 }

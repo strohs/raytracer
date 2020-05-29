@@ -3,7 +3,7 @@ use crate::common::{Color, Point3, Vec3, Camera};
 use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere};
 use crate::material::{Lambertian, Material, Metal, Dielectric};
 use rand::Rng;
-use crate::texture::{Texture, SolidColor, Checker, Perlin, Noise};
+use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
 /// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
@@ -43,7 +43,7 @@ fn generate_random_spheres() -> HittableList {
     let mut world = HittableList::new();
 
     // a big, Lambertian grey, sphere that will act at the ground
-    let checker_tex: Arc<dyn Texture> = Arc::new(Checker::from(
+    let checker_tex: Arc<dyn Texture> = Arc::new(CheckerTexture::from(
         Arc::new(SolidColor::from_rgb(0.2, 0.3, 0.1)),
         Arc::new(SolidColor::from_rgb(0.9, 0.9, 0.9))));
     let ground_material: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&checker_tex)));
@@ -73,6 +73,13 @@ fn generate_random_spheres() -> HittableList {
                                     0.0, 1.0,
                                     0.2,
                                     Arc::new(Lambertian::new(Arc::clone(&albedo))))));
+                // } else if prob < 0.4 {
+                //     // create a marble textured sphere
+                //     let marble_tex: Arc<dyn Texture> = Arc::new(Noise::new(Perlin::new(), 5.0));
+                //     let center = center + Vec3::new(0., rng.gen::<f64>(), 0.);
+                //     let mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&marble_tex)));
+                //     let sphere = Sphere::new(center, 0.2, mat);
+                //     world.add(Arc::new(sphere));
                 } else if prob < 0.7 {
                     // create a solid color, Lambertian sphere
                     let solid_tex: Arc<dyn Texture> = Arc::new(SolidColor::from(Color::random() * Color::random()));
@@ -134,7 +141,7 @@ pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
 
     // generate two checkered spheres
     let check_tex: Arc<dyn Texture> = Arc::new(
-        Checker::from(
+        CheckerTexture::from(
             Arc::new(SolidColor::from_rgb(0.2, 0.3, 0.1)),
             Arc::new(SolidColor::from_rgb(0.9, 0.9, 0.9))));
     let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&check_tex)));
@@ -171,7 +178,7 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
         0.0, 1.0);
 
     // generate two checkered spheres
-    let perlin_tex: Arc<dyn Texture> = Arc::new(Noise::new(Perlin::new(), 5.));
+    let perlin_tex: Arc<dyn Texture> = Arc::new(NoiseTexture::new(Perlin::new(), 2.));
     let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&perlin_tex)));
     let sphere1 = Sphere::new(Point3::new(0., -1000., 0.), 1000., Arc::clone(&lamb));
     let sphere2 = Sphere::new(Point3::new(0., 2., 0.), 2., Arc::clone(&lamb));
@@ -179,6 +186,40 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
     let mut world = HittableList::new();
     world.add(Arc::new(sphere1));
     world.add(Arc::new(sphere2));
+
+    (camera, world, image_width, image_height)
+}
+
+/// builds a scene with two checkered spheres on top of each other
+///
+pub fn build_earth_sphere(image_width: u32, aspect_ratio: f64, file_path: &str)
+                                -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 30.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // build a image mapped sphere
+    let earth_tex: Arc<dyn Texture> = Arc::new(ImageTexture::from(file_path));
+    let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&earth_tex)));
+    let sphere = Sphere::new(Point3::new(0., 0., 0.), 2., Arc::clone(&lamb));
+
+    let mut world = HittableList::new();
+    world.add(Arc::new(sphere));
 
     (camera, world, image_width, image_height)
 }

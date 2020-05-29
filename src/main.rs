@@ -17,8 +17,11 @@ fn main() {
     // let (camera, world, image_width, image_height) =
     //     scenes::build_random_sphere_scene(image_width, aspect_ratio);
 
+    // let (camera, world, image_width, image_height) =
+    //     scenes::build_two_perlin_spheres(image_width, aspect_ratio);
+
     let (camera, world, image_width, image_height) =
-        scenes::build_two_perlin_spheres(image_width, aspect_ratio);
+        scenes::build_earth_sphere(image_width, aspect_ratio, "./earthmap.jpg");
     
     let now = Instant::now();
     println!("rendering {}x{} image...", &image_width, &image_height);
