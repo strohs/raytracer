@@ -7,7 +7,10 @@ pub use metal::*;
 pub mod dielectric;
 pub use dielectric::*;
 
-use crate::common::{Ray, Color, Vec3};
+pub mod diffuse_light;
+pub use diffuse_light::*;
+
+use crate::common::{Ray, Color, Vec3, Point3};
 use crate::hittable::HitRecord;
 use std::ops::Neg;
 use std::fmt::Debug;
@@ -32,9 +35,15 @@ impl ScatterRecord {
 
 pub trait Material: Send + Sync + Debug {
 
-    /// returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
+    /// Returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
     /// If this material did not scatter `r_in`, `None` is returned
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;
+
+    /// Returns a `Color` emitted by this material. The base implementation of this trait
+    /// returns black as the default color
+    fn emitted(&self, _u: f64, _v: f64, _p: &Point3) -> Color {
+        Color::default()
+    }
 }
 
 /// Returns a *reflected* `Vec3` between `v` and `n`, where `n` is a unit vector

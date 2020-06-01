@@ -67,31 +67,36 @@ pub fn render(camera: Camera,
 }
 
 /// determine if a Ray has hit a `Hittable` object in the `world` and compute the pixel color
-/// of the `Ray`. The Hittable's `Material` is taken into account when performing ray bouncing
+/// of the Ray, `r`. The Hittable's `Material` is taken into account when performing ray bouncing
 /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
 /// was hit, than a linearly blended "sky" color is returned
 fn ray_color<T: Hittable + ?Sized>(
     r: &Ray,
     world: &T,
+    background: &Color,
     depth: u32) -> Color
 {
     // exceeded the ray bounce limit, no more light is gathered
     if depth == 0 {
-        Color::default()
-    } else if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
-        if let Some(scatter_rec) = rec.mat_ptr.scatter(r, rec) {
-            scatter_rec.attenuation * ray_color(&scatter_rec.scattered, world, depth - 1)
-        } else {
-            Color::default()
-        }
-    } else {
-        // nothing hit, return a linear interpolated sky Color from white to blue based on height
-        // of Ray's y coordinate
-        let unit_direction = r.direction().unit_vector();
-        let t = 0.5 * (unit_direction.y() + 1.0);
+        return Color::default();
+    }
 
-        (1.0 - t) * Color::new(1.0, 1.0, 1.0)
-            + t * Color::new(0.5, 0.7, 1.0)
+    // if a hittable in the world was hit, determine if its material will scatter the incoming
+    // ray, and if its material emits light
+    if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
+        let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
+
+        if let Some(scatter_rec) = rec.mat_ptr.scatter(r, rec) {
+            return emitted
+                + scatter_rec.attenuation
+                * ray_color(&scatter_rec.scattered, world, background, depth - 1)
+        } else {
+            return emitted;
+        }
+
+    } else {
+        // nothing hit, return the background color
+        return *background;
     }
 }
 
@@ -107,15 +112,16 @@ fn multi_sample_pixel<T: Hittable + ?Sized>(
 {
     let mut rng = rand::thread_rng();
     let mut pixel_color = Color::default();
+    let background = Color::default();
 
     for _ in 0..MAX_SAMPLES_PER_PIXEL {
-        // u,v are offsets that randomly choose a pixel close to the current pixel
+        // u,v are offsets that randomly choose a point close to the current pixel
         let u = (pw as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
         let v = (ph as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
 
         let r: Ray = camera.get_ray(u, v);
 
-        pixel_color += ray_color(&r, world, MAX_RAY_BOUNCE_DEPTH);
+        pixel_color += ray_color(&r, world, &background, MAX_RAY_BOUNCE_DEPTH);
     }
 
     color::multi_sample(&pixel_color, MAX_SAMPLES_PER_PIXEL)

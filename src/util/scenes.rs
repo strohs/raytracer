@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere};
-use crate::material::{Lambertian, Material, Metal, Dielectric};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace};
+use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use rand::Rng;
 use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
@@ -220,6 +220,102 @@ pub fn build_earth_sphere(image_width: u32, aspect_ratio: f64, file_path: &str)
 
     let mut world = HittableList::new();
     world.add(Arc::new(sphere));
+
+    (camera, world, image_width, image_height)
+}
+
+/// builds a scene with two perlin spheres, and a xy_rectangle light source
+pub fn build_two_perlin_spheres_with_light_rect(image_width: u32, aspect_ratio: f64)
+                                -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(13.0, 2.0, 3.0);
+    let look_at = Point3::new(0.0, 0.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 60.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // generate two checkered spheres
+    let perlin_tex: Arc<dyn Texture> = Arc::new(NoiseTexture::new(Perlin::new(), 2.));
+    let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&perlin_tex)));
+    let sphere1 = Sphere::new(Point3::new(0., -1000., 0.), 1000., Arc::clone(&lamb));
+    let sphere2 = Sphere::new(Point3::new(0., 2., 0.), 2., Arc::clone(&lamb));
+
+    // build the rectangle light source, it's brighter than 1,1,1 so that it's bright enough to light things
+    let solid_tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(4.0, 4.0, 4.0));
+    let diff_light: Arc<dyn Material> = Arc::new(DiffuseLight::from( Arc::clone(&solid_tex)));
+    let sphere3 = Sphere::new(Point3::new(0.0, 7.0, 0.0), 2.0, Arc::clone(&diff_light));
+    let xy_rect = XYRect::from(3., 4., 1., 3., -2., Arc::clone(&diff_light));
+
+    let mut world = HittableList::new();
+    world.add(Arc::new(sphere1));
+    world.add(Arc::new(sphere2));
+    world.add(Arc::new(sphere3));
+    world.add(Arc::new(xy_rect));
+
+    (camera, world, image_width, image_height)
+}
+
+
+
+/// builds a scene with an empty cornell box
+pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
+                                                -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_at = Point3::new(278.0, 278.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // build solid color materials
+    let red: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.65, 0.05, 0.05));
+    let white: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.73, 0.73, 0.73));
+    let green: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.12,  0.45, 0.15));
+    let bright_light: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(15.,  15., 15.));
+    let red_mat: Arc<dyn Material> = Arc::new(Lambertian::new( Arc::clone(&red)));
+    let white_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&white)));
+    let green_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&green)));
+    let light_mat: Arc<dyn Material> = Arc::new(DiffuseLight::from(Arc::clone(&bright_light)));
+
+    // build the walls of the room
+    let green_wall = Arc::new(FlipFace::from(Arc::new(YZRect::from(0., 555., 0., 555., 555., Arc::clone(&green_mat)))));
+    let red_wall = Arc::new(YZRect::from(0., 555., 0., 555., 0., Arc::clone(&red_mat)));
+    let light = Arc::new(XZRect::from(213., 343., 227., 332., 554., Arc::clone(&light_mat)));
+    let floor = Arc::new(FlipFace::from(Arc::new(XZRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
+    let ceiling = Arc::new(XZRect::from(0., 555., 0., 555., 0., Arc::clone(&white_mat)));
+    let back_wall = Arc::new(FlipFace::from(Arc::new(XYRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
+
+    let mut world = HittableList::new();
+    world.add(green_wall);
+    world.add(red_wall);
+    world.add(light);
+    world.add(floor);
+    world.add(ceiling);
+    world.add(back_wall);
 
     (camera, world, image_width, image_height)
 }

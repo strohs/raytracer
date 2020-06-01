@@ -7,6 +7,12 @@ pub use moving_sphere::*;
 pub mod aabb;
 pub use aabb::*;
 
+pub mod aa_rect;
+pub use aa_rect::*;
+
+pub mod flip_face;
+pub use flip_face::*;
+
 pub mod bvh_node;
 pub use bvh_node::*;
 
