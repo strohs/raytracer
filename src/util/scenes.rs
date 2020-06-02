@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use rand::Rng;
 use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate};
 use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
@@ -309,15 +309,27 @@ pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
     let ceiling = Arc::new(XZRect::from(0., 555., 0., 555., 0., Arc::clone(&white_mat)));
     let back_wall = Arc::new(FlipFace::from(Arc::new(XYRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
 
-    // build two boxes
-    let rect_box = Arc::new(BoxInst::from(
-        Point3::new(130., 0., 65.),
-        Point3::new(295., 165., 230.),
+    // build a rectangular box
+    let mut rect_box: Arc<dyn Hittable> = Arc::new(BoxInst::from(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 330., 165.),
         Arc::clone(&white_mat)));
-    let square_box = Arc::new(BoxInst::from(
-        Point3::new(265., 0., 295.),
-        Point3::new(430., 330., 460.),
+    rect_box = Arc::new(RotateY::from(
+        Arc::clone(&rect_box),
+        15.0));
+    rect_box = Arc::new(Translate::from(
+        Arc::clone(&rect_box),
+        Vec3::new(265., 0., 295.)));
+
+    // build a square box
+    let mut square_box: Arc<dyn Hittable> = Arc::new(BoxInst::from(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 165., 165.),
         Arc::clone(&white_mat)));
+    square_box = Arc::new(RotateY::from(Arc::clone(&square_box), -18.0));
+    square_box = Arc::new(Translate::from(
+        Arc::clone(&square_box),
+        Vec3::new(130., 0., 65.)));
 
     let mut world = HittableList::new();
     world.add(green_wall);

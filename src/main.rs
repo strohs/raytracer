@@ -8,7 +8,7 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
 
     // desired image width
-    let image_width = 1280;
+    let image_width = 1900;
 
     // number of worker threads to spin up
     let pool_size = num_cpus::get_physical();

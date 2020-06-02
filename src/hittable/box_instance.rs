@@ -3,7 +3,7 @@ use crate::hittable::{HittableList, XYRect, FlipFace, XZRect, YZRect, Hittable, 
 use crate::material::Material;
 use std::sync::Arc;
 
-/// BoxInst is a 3D box made up of six rectangles
+/// BoxInst is a 3D box made up of six axis-aligned rectangles
 #[derive(Default, Debug)]
 pub struct BoxInst {
     box_min: Point3,

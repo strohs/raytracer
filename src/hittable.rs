@@ -28,6 +28,9 @@ pub use hittable_list::*;
 pub mod translate;
 pub use translate::*;
 
+pub mod rotate;
+pub use rotate::*;
+
 use crate::common::{Ray};
 
 /// A trait for objects in our scene that can be *hit* by a Ray

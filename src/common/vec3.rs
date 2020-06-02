@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, Result};
-use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index};
+use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index, IndexMut};
 use crate::common::clamp;
 use core::f64::consts::PI;
 use rand::Rng;
@@ -360,7 +360,23 @@ impl Index<usize> for Vec3 {
             0 => &self.x,
             1 => &self.y,
             2 => &self.z,
-            _ => panic!("index must be in range 0..3")
+            _ => panic!("index must be in range 0..2 inclusive")
+        }
+    }
+}
+
+impl IndexMut<usize> for Vec3 {
+
+    /// returns the x,y or z value of this Vec3 using the index operator `[]`
+    ///
+    /// # Panics
+    /// the `index` must be in the range `0..=2` or else this function panics
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        match index {
+            0 => &mut self.x,
+            1 => &mut self.y,
+            2 => &mut self.z,
+            _ => panic!("index must be in range 0..2 inclusive")
         }
     }
 }
