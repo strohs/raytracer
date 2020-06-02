@@ -13,6 +13,9 @@ pub use aa_rect::*;
 pub mod flip_face;
 pub use flip_face::*;
 
+pub mod box_instance;
+pub use box_instance::*;
+
 pub mod bvh_node;
 pub use bvh_node::*;
 
@@ -21,6 +24,9 @@ pub use hit_record::*;
 
 pub mod hittable_list;
 pub use hittable_list::*;
+
+pub mod translate;
+pub use translate::*;
 
 use crate::common::{Ray};
 

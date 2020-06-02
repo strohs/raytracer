@@ -1,8 +1,8 @@
 use std::sync::Arc;
-use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace};
-use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use rand::Rng;
+use crate::common::{Color, Point3, Vec3, Camera};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst};
+use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
@@ -309,6 +309,16 @@ pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
     let ceiling = Arc::new(XZRect::from(0., 555., 0., 555., 0., Arc::clone(&white_mat)));
     let back_wall = Arc::new(FlipFace::from(Arc::new(XYRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
 
+    // build two boxes
+    let rect_box = Arc::new(BoxInst::from(
+        Point3::new(130., 0., 65.),
+        Point3::new(295., 165., 230.),
+        Arc::clone(&white_mat)));
+    let square_box = Arc::new(BoxInst::from(
+        Point3::new(265., 0., 295.),
+        Point3::new(430., 330., 460.),
+        Arc::clone(&white_mat)));
+
     let mut world = HittableList::new();
     world.add(green_wall);
     world.add(red_wall);
@@ -316,6 +326,8 @@ pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
     world.add(floor);
     world.add(ceiling);
     world.add(back_wall);
+    world.add(rect_box);
+    world.add(square_box);
 
     (camera, world, image_width, image_height)
 }
