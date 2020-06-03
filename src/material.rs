@@ -10,6 +10,9 @@ pub use dielectric::*;
 pub mod diffuse_light;
 pub use diffuse_light::*;
 
+pub mod isotropic;
+pub use isotropic::*;
+
 use crate::common::{Ray, Color, Vec3, Point3};
 use crate::hittable::HitRecord;
 use std::ops::Neg;

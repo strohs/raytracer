@@ -1,20 +1,14 @@
-pub mod sphere;
-pub use sphere::*;
+pub mod primitive;
+pub use primitive::*;
 
-pub mod moving_sphere;
-pub use moving_sphere::*;
+pub mod volume;
+pub use volume::*;
 
 pub mod aabb;
 pub use aabb::*;
 
-pub mod aa_rect;
-pub use aa_rect::*;
-
 pub mod flip_face;
 pub use flip_face::*;
-
-pub mod box_instance;
-pub use box_instance::*;
 
 pub mod bvh_node;
 pub use bvh_node::*;

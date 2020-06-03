@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use rand::Rng;
 use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate, ConstantMedium};
 use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
@@ -269,9 +269,9 @@ pub fn build_two_perlin_spheres_with_light_rect(image_width: u32, aspect_ratio: 
 
 
 
-/// builds a scene with an empty cornell box
-pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
-                                                -> (Camera, HittableList, u32, u32)
+/// builds a cornell box containing two boxes
+pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
+                                        -> (Camera, HittableList, u32, u32)
 {
     let image_height = (image_width as f64 / aspect_ratio) as u32;
 
@@ -340,6 +340,88 @@ pub fn build_empty_cornell_box(image_width: u32, aspect_ratio: f64)
     world.add(back_wall);
     world.add(rect_box);
     world.add(square_box);
+
+    (camera, world, image_width, image_height)
+}
+
+
+
+/// builds a cornell box scene with smoke and fox boxes
+pub fn build_cornell_smoke_box(image_width: u32, aspect_ratio: f64)
+                               -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_at = Point3::new(278.0, 278.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // build solid color materials
+    let red: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.65, 0.05, 0.05));
+    let white: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.73, 0.73, 0.73));
+    let green: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0.12,  0.45, 0.15));
+    let all_black: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(0., 0., 0.));
+    let all_white: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(1., 1., 1.));
+    let light_tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(7., 7., 7.));
+    let red_mat: Arc<dyn Material> = Arc::new(Lambertian::new( Arc::clone(&red)));
+    let white_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&white)));
+    let green_mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&green)));
+    let light_mat: Arc<dyn Material> = Arc::new(DiffuseLight::from(Arc::clone(&light_tex)));
+
+    // build the walls of the room
+    let green_wall = Arc::new(FlipFace::from(Arc::new(YZRect::from(0., 555., 0., 555., 555., Arc::clone(&green_mat)))));
+    let red_wall = Arc::new(YZRect::from(0., 555., 0., 555., 0., Arc::clone(&red_mat)));
+    let light = Arc::new(XZRect::from(113., 443., 127., 432., 554., Arc::clone(&light_mat)));
+    let floor = Arc::new(FlipFace::from(Arc::new(XZRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
+    let ceiling = Arc::new(XZRect::from(0., 555., 0., 555., 0., Arc::clone(&white_mat)));
+    let back_wall = Arc::new(FlipFace::from(Arc::new(XYRect::from(0., 555., 0., 555., 555., Arc::clone(&white_mat)))));
+
+    // build a rectangular box
+    let mut rect_box: Arc<dyn Hittable> = Arc::new(BoxInst::from(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 330., 165.),
+        Arc::clone(&white_mat)));
+    rect_box = Arc::new(RotateY::from(
+        Arc::clone(&rect_box),
+        15.0));
+    rect_box = Arc::new(Translate::from(
+        Arc::clone(&rect_box),
+        Vec3::new(265., 0., 295.)));
+
+    // build a square box
+    let mut square_box: Arc<dyn Hittable> = Arc::new(BoxInst::from(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 165., 165.),
+        Arc::clone(&white_mat)));
+    square_box = Arc::new(RotateY::from(Arc::clone(&square_box), -18.0));
+    square_box = Arc::new(Translate::from(
+        Arc::clone(&square_box),
+        Vec3::new(130., 0., 65.)));
+
+    let fog_box = Arc::new(ConstantMedium::from(Arc::clone(&rect_box), 0.01, all_black));
+    let smoke_box = Arc::new(ConstantMedium::from(Arc::clone(&square_box), 0.01, all_white));
+
+    let mut world = HittableList::new();
+    world.add(green_wall);
+    world.add(red_wall);
+    world.add(light);
+    world.add(floor);
+    world.add(ceiling);
+    world.add(back_wall);
+    world.add(fog_box);
+    world.add(smoke_box);
 
     (camera, world, image_width, image_height)
 }

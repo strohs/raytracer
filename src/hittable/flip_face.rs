@@ -2,8 +2,8 @@ use crate::hittable::{Hittable, HitRecord, Aabb};
 use std::sync::Arc;
 use crate::common::Ray;
 
-/// FlipFace is a "adapter" struct that takes another hittable and "flips" it's front face
-/// outward normal
+/// FlipFace is a "wrapper" struct that wraps another hittable and "flips" its front face
+/// outward normal vector
 #[derive(Debug)]
 pub struct FlipFace {
     ptr: Arc<dyn Hittable>,

@@ -8,7 +8,7 @@ fn main() {
     let aspect_ratio = 16.0 / 9.0;
 
     // desired image width
-    let image_width = 1900;
+    let image_width = 1280;
 
     // number of worker threads to spin up
     let pool_size = num_cpus::get_physical();
@@ -27,7 +27,7 @@ fn main() {
     //     scenes::build_two_perlin_spheres_with_light_rect(image_width, aspect_ratio);
 
     let (camera, world, image_width, image_height) =
-        scenes::build_empty_cornell_box(image_width, aspect_ratio);
+        scenes::build_cornell_smoke_box(image_width, aspect_ratio);
     
     let now = Instant::now();
     println!("rendering {}x{} image...", &image_width, &image_height);
