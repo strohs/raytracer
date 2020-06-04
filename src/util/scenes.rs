@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use rand::Rng;
 use crate::common::{Color, Point3, Vec3, Camera};
-use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate, ConstantMedium};
+use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate, ConstantMedium, BvhNode};
 use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
 
@@ -192,7 +192,7 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
 
 /// builds a scene with two checkered spheres on top of each other
 ///
-pub fn build_earth_sphere(image_width: u32, aspect_ratio: f64, file_path: &str)
+pub fn build_earth_scene(image_width: u32, aspect_ratio: f64, file_path: &str)
                                 -> (Camera, HittableList, u32, u32)
 {
     let image_height = (image_width as f64 / aspect_ratio) as u32;
@@ -424,4 +424,207 @@ pub fn build_cornell_smoke_box(image_width: u32, aspect_ratio: f64)
     world.add(smoke_box);
 
     (camera, world, image_width, image_height)
+}
+
+
+/// Returns a scene
+pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
+                               -> (Camera, HittableList, u32, u32)
+{
+    let image_height = (image_width as f64 / aspect_ratio) as u32;
+
+    // camera settings
+    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_at = Point3::new(278.0, 278.0, 0.0);
+    let vup = Vec3::new(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.0;
+    let vfov = 40.0;
+    let camera = Camera::new(
+        look_from, look_at,
+        vup,
+        vfov,
+        aspect_ratio,
+        aperture,
+        dist_to_focus,
+        0.0, 1.0);
+
+    // build a ground layer consisting of ~400 boxes of various widths and heights
+    let mut boxes1 = HittableList::new();
+    let ground_mat: Arc<dyn Material> = Arc::new(build_solid_lambertian(0.48, 0.83, 0.53));
+    let boxes_per_side = 20;
+    let mut rng = rand::thread_rng();
+    for i in 0..boxes_per_side {
+        for j in 0..boxes_per_side {
+            let w = 100.0;
+            let x0 = -1000.0 + i as f64 * w as f64;
+            let z0 = -1000.0 + j as f64 * w as f64;
+            let y0 = 0.0;
+            let x1 = x0 + w;
+            let y1: f64 = rng.gen_range(1.0, 101.0);
+            let z1 = z0 + w;
+
+            let box_inst = BoxInst::from(
+                Point3::new(x0,y0, z0),
+                Point3::new(x1, y1, z1),
+                Arc::clone(&ground_mat));
+            boxes1.add(Arc::new(box_inst));
+        }
+    }
+
+    // objects will hold all the hittables in this scene
+    let mut objects = HittableList::new();
+
+    // add the ground boxes into a BVH and then add that to the list of objects
+    objects.add(Arc::new(BvhNode::from(&mut boxes1, 0., 1.)));
+
+    // build a light source
+    let light = build_xz_diff_light(
+        Color::new(7.,7.,7.),
+        123.,423.,
+        147.,412.,554.);
+    objects.add(Arc::new(light));
+
+    // build a moving sphere
+    let center_start = Point3::new(400., 400., 200.);
+    let mov_sphere = build_solid_moving_sphere(
+        Color::new(0.7, 0.3, 0.1),
+        center_start,
+        center_start + Vec3::new(30., 0., 0.),
+        0.0, 1.0,
+        50.0);
+    objects.add(Arc::new(mov_sphere));
+
+    // build a glass sphere
+    let glass_sphere = build_dielectric_sphere(
+        Point3::new(260., 150., 45.),
+        50.,
+        1.5);
+    objects.add(Arc::new(glass_sphere));
+
+    // build a metal sphere
+    let metal_sphere = build_metal_sphere(
+        Point3::new(0.,150.,145.),
+        50.0,
+        Color::new(0.8,0.8,0.9),
+        10.);
+    objects.add(Arc::new(metal_sphere));
+
+    // build a "foggy", sphere
+    let sphere_boundary: Arc<dyn Hittable> = Arc::new(build_dielectric_sphere(
+        Point3::new(360., 150., 145.),
+        70.,
+        1.5));
+    objects.add(Arc::clone(&sphere_boundary));
+    let fog_volume = build_constant_medium(
+        sphere_boundary, 0.2, Color::new(0.2, 0.4, 0.9));
+    objects.add(Arc::new(fog_volume));
+
+    // build a spherical mist volume throughout the whole scene
+    let sphere_boundary: Arc<dyn Hittable> = Arc::new(build_dielectric_sphere(
+        Point3::new(0., 0., 0.),
+        5000.,
+        1.5));
+    let mist_volume = build_constant_medium(
+        sphere_boundary, 0.0001, Color::new(1., 1., 1.));
+    objects.add(Arc::new(mist_volume));
+
+    // build a image mapped sphere with a earth texture
+    let earth = build_earth_sphere(Point3::new(400., 200., 400.), 100.);
+    objects.add(Arc::new(earth));
+
+    // build a sphere with perlin noise texture
+    let perlin_sphere = build_perlin_sphere(
+        Point3::new(220., 280., 300.),
+        80.0,
+        0.1);
+    objects.add(Arc::new(perlin_sphere));
+
+    // build a box composed of ~1000 smaller spheres
+    let ns = 1000; // number of internal spheres
+    let mut box_of_sphere = HittableList::new();
+    for _ in 0..ns {
+        let sphere: Arc<dyn Hittable> = Arc::new(
+            build_solid_sphere(
+                Point3::random_range(0.0, 165.0), 10.0,
+                Color::new(0.73, 0.73, 0.73)));
+        box_of_sphere.add(sphere);
+    }
+
+    // add the box of spheres to a BVH and then translate and rotate the entire box of spheres
+    let sphere_box = BvhNode::from(&mut box_of_sphere, 0.0, 1.0);
+    let rotated_spheres: Arc<dyn Hittable> = Arc::new(
+        RotateY::from(Arc::new(sphere_box), 15.0));
+    let translated_spheres: Arc<dyn Hittable> = Arc::new(
+        Translate::from(
+            Arc::clone(&rotated_spheres),
+            Vec3::new(-100., 270., 395.)));
+    objects.add(translated_spheres);
+
+
+    (camera, objects, image_width, image_height)
+}
+
+
+
+
+
+
+
+/// Returns a lambertian material with a solid color texture consisting of the specified `r,g,b`
+fn build_solid_lambertian(r: f64, g: f64, b: f64) -> impl Material {
+    let solid_color= SolidColor::from_rgb(r,g,b);
+    Lambertian::new(Arc::new(solid_color))
+}
+
+/// Returns a diffuse light material with the specified Color and coordinates
+fn build_xz_diff_light(light_color: Color, x0: f64, x1: f64, z0: f64, z1: f64, k: f64) -> XZRect {
+    let light_color = SolidColor::from(light_color);
+    let diff_light = DiffuseLight::from(Arc::new(light_color));
+    XZRect::from(x0, x1, z0, z1, k, Arc::new(diff_light))
+}
+
+fn build_solid_moving_sphere(color: Color, c1: Point3, c2: Point3, t0: f64, t1: f64, rad: f64) -> MovingSphere {
+    let solid_lamb = build_solid_lambertian(color.x(), color.y(), color.z());
+    MovingSphere::new(c1, c2, t0, t1, rad, Arc::new(solid_lamb))
+}
+
+/// Returns a new sphere with a dielectric material with the specified refractive index `ref_idx`
+fn build_dielectric_sphere(center: Point3, rad: f64, ref_idx: f64) -> Sphere {
+    let dielectric = Dielectric::new(ref_idx);
+    Sphere::new(center, rad, Arc::new(dielectric))
+}
+
+/// Returns a new sphere with a metal material with the specified color and fuzziness
+fn build_metal_sphere(center: Point3, rad: f64, color: Color, fuzz: f64) -> Sphere {
+    let metal = Metal::new(color, fuzz);
+    Sphere::new(center, rad, Arc::new(metal))
+}
+
+/// Returns a new sphere with a solid lambertian material, with the specified color
+fn build_solid_sphere(center: Point3, rad: f64, color: Color) -> Sphere {
+    let solid_tex = SolidColor::from(color);
+    let mat = Lambertian::new(Arc::new(solid_tex));
+    Sphere::new(center, rad, Arc::new(mat))
+}
+
+/// Returns a new Constant Medium composed of the specified boundary, density and color
+fn build_constant_medium(bound: Arc<dyn Hittable>, density: f64, color: Color) -> ConstantMedium {
+    let solid_color = SolidColor::from(color);
+    let boundary: Arc<dyn Hittable> = Arc::clone(&bound);
+    ConstantMedium::from(boundary, density, Arc::new(solid_color))
+}
+
+/// Returns a sphere textured with the 'earthmap.jpg' texture
+fn build_earth_sphere(center: Point3, rad: f64) -> Sphere {
+    let etex = ImageTexture::from("./earthmap.jpg");
+    let emat = Lambertian::new(Arc::new(etex));
+    Sphere::new(center, rad, Arc::new(emat))
+}
+
+/// Returns a new sphere with a perlin noise texture
+fn build_perlin_sphere(center: Point3, rad: f64, noise_scale: f64) -> Sphere {
+    let pertex = NoiseTexture::new(Perlin::new(), noise_scale);
+    let permat = Lambertian::new(Arc::new(pertex));
+    Sphere::new(center, rad, Arc::new(permat))
 }

@@ -26,8 +26,12 @@ fn main() {
     // let (camera, world, image_width, image_height) =
     //     scenes::build_two_perlin_spheres_with_light_rect(image_width, aspect_ratio);
 
+    // let (camera, world, image_width, image_height) =
+    //     scenes::build_cornell_smoke_box(image_width, aspect_ratio);
+
+    // build final scene
     let (camera, world, image_width, image_height) =
-        scenes::build_cornell_smoke_box(image_width, aspect_ratio);
+        scenes::build_final_scene(image_width, aspect_ratio);
     
     let now = Instant::now();
     println!("rendering {}x{} image...", &image_width, &image_height);
