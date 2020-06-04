@@ -225,8 +225,8 @@ pub fn build_earth_scene(image_width: u32, aspect_ratio: f64, file_path: &str)
 }
 
 /// builds a scene with two perlin spheres, and a xy_rectangle light source
-pub fn build_two_perlin_spheres_with_light_rect(image_width: u32, aspect_ratio: f64)
-                                -> (Camera, HittableList, u32, u32)
+pub fn build_two_perlin_spheres_with_light_source(image_width: u32, aspect_ratio: f64)
+                                                  -> (Camera, HittableList, u32, u32)
 {
     let image_height = (image_width as f64 / aspect_ratio) as u32;
 
@@ -246,23 +246,29 @@ pub fn build_two_perlin_spheres_with_light_rect(image_width: u32, aspect_ratio: 
         dist_to_focus,
         0.0, 1.0);
 
-    // generate two checkered spheres
-    let perlin_tex: Arc<dyn Texture> = Arc::new(NoiseTexture::new(Perlin::new(), 2.));
-    let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&perlin_tex)));
-    let sphere1 = Sphere::new(Point3::new(0., -1000., 0.), 1000., Arc::clone(&lamb));
-    let sphere2 = Sphere::new(Point3::new(0., 2., 0.), 2., Arc::clone(&lamb));
+    // generate two spheres with a perlin noise texture
+    let sphere1 = build_perlin_sphere(
+        Point3::new(0.,-1000., 0.),
+        1000.,
+        0.5);
+    let sphere2 = build_perlin_sphere(
+        Point3::new(0.,2., 0.),
+        2.,
+        0.5);
 
-    // build the rectangle light source, it's brighter than 1,1,1 so that it's bright enough to light things
-    let solid_tex: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(4.0, 4.0, 4.0));
-    let diff_light: Arc<dyn Material> = Arc::new(DiffuseLight::from( Arc::clone(&solid_tex)));
-    let sphere3 = Sphere::new(Point3::new(0.0, 7.0, 0.0), 2.0, Arc::clone(&diff_light));
-    let xy_rect = XYRect::from(3., 4., 1., 3., -2., Arc::clone(&diff_light));
+    // build the rectangle light source, colors are brighter than 1,1,1 so that it's bright enough to light things
+    let xy_rect = build_xy_diff_light(
+        Color::new(4., 4., 4.),
+        3., 4., 1., 3., -2.);
+    let xz_rect = build_xz_diff_light(
+        Color::new(4., 4., 4.),
+        -2., 2., -2., 2., 6.);
 
     let mut world = HittableList::new();
     world.add(Arc::new(sphere1));
     world.add(Arc::new(sphere2));
-    world.add(Arc::new(sphere3));
     world.add(Arc::new(xy_rect));
+    world.add(Arc::new(xz_rect));
 
     (camera, world, image_width, image_height)
 }
@@ -427,7 +433,7 @@ pub fn build_cornell_smoke_box(image_width: u32, aspect_ratio: f64)
 }
 
 
-/// Returns a scene
+/// Returns the camera and HittableList for the final scene from "Raytracing the Next Week".
 pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
                                -> (Camera, HittableList, u32, u32)
 {
@@ -582,6 +588,13 @@ fn build_xz_diff_light(light_color: Color, x0: f64, x1: f64, z0: f64, z1: f64, k
     let light_color = SolidColor::from(light_color);
     let diff_light = DiffuseLight::from(Arc::new(light_color));
     XZRect::from(x0, x1, z0, z1, k, Arc::new(diff_light))
+}
+
+/// Returns a diffuse light material with the specified Color and coordinates
+fn build_xy_diff_light(light_color: Color, x0: f64, x1: f64, y0: f64, y1: f64, k: f64) -> XYRect {
+    let light_color = SolidColor::from(light_color);
+    let diff_light = DiffuseLight::from(Arc::new(light_color));
+    XYRect::from(x0, x1, y0, y1, k, Arc::new(diff_light))
 }
 
 fn build_solid_moving_sphere(color: Color, c1: Point3, c2: Point3, t0: f64, t1: f64, rad: f64) -> MovingSphere {

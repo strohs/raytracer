@@ -9,17 +9,17 @@ use crate::hittable::{Hittable, BvhNode, HittableList};
 // max recursion depth allowed when bouncing rays of hittables
 const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
 // maximum samples to use, per pixel, when anti-aliasing
-const MAX_SAMPLES_PER_PIXEL: u32 = 100;
+const MAX_SAMPLES_PER_PIXEL: u32 = 1000;
 
 
 /// Renders an image using the provided `Camera` and `World`. `num_workers` is the number of
-/// **os threads** to use for rendering, this should be set to the number of physical or logical
-/// cores on the machine you are rendering on.
-/// `image_width`, `image_height` is the desired width/height of the final image.
+/// **operating system threads** to use for rendering, this should be set to the number of
+/// physical or logical cores on the machine you are rendering on.
+/// `image_width`, `image_height` is the desired width and height of the final image.
 ///
 /// # Returns
-/// a Vec of `Color` where each Color represents a pixel color. The image is returned in reverse
-/// row order, meaning the bottom rows of the image appear first in the Vec
+/// a Vector of `Color` representing the final color of each pixel in the image.
+/// The image is stored row by row,  from top left of the image to the bottom right
 pub fn render(camera: Camera,
               mut world: HittableList,
               num_workers: usize,
@@ -44,23 +44,27 @@ pub fn render(camera: Camera,
                 let camera = Arc::clone(&camera);
 
                 pool.execute(move || {
-                    let pixel_color = multi_sample_pixel(i, j, &camera, &*world, image_width, image_height);
+                    let pixel_color = multi_sample_pixel(i, j,
+                                                         &camera,
+                                                         &*world,
+                                                         image_width, image_height);
                     tx.send((i, j, pixel_color)).expect("error occurred rendering pixel");
                 });
             }
         }
-        println!("submitted {} pixel render jobs with a thread pool size = {}", image_width * image_height, num_workers);
+        println!("submitted {} pixel render jobs with a thread pool size = {}",
+                 image_width * image_height,
+                 num_workers);
         rx
     };
 
     // allocate a vector to store the pixel colors of the image (in row major format)
     let mut image: Vec<Color> = vec![Color::default(); (image_width * image_height) as usize];
 
-    // read finished jobs data from the channel
-    for (pixel_row, pixel_col, pixel_color) in rx.iter() {
-        // ppm images are stored in reverse row order (start from lower left of image to upper right)
-        let index = ((image_height - 1 - pixel_col) * image_width + pixel_row) as usize;
-        image[index] = pixel_color;
+    // read finished jobs data from the channel and store in image vector
+    for (pixel_col, pixel_row, pixel_color) in rx.iter() {
+        let idx = (pixel_row * image_width + pixel_col) as usize;
+        image[idx] = pixel_color;
     }
 
     image
@@ -82,7 +86,7 @@ fn ray_color<T: Hittable + ?Sized>(
     }
 
     // if a hittable in the world was hit, determine if its material will scatter the incoming
-    // ray, and if its material emits light
+    // ray, AND if its material emits light
     if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
         let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
 
