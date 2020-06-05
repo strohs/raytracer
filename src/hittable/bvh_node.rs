@@ -111,11 +111,10 @@ impl BvhNode {
             .expect("Hittable 'b' doesn't have a bounding box");
 
         box_a.min()[axis].partial_cmp(&box_b.min()[axis])
-            .expect(
-                format!("could not compare axis {} of box 'a' {:?} against box 'b' {:?}",
-                        axis,
-                        box_a.min()[axis],
-                        box_b.min()[axis]).as_str())
+            .unwrap_or_else(|| panic!("could not compare axis {} of box 'a' {:?} against box 'b' {:?}",
+                                      axis,
+                                      box_a.min()[axis],
+                                      box_b.min()[axis]))
     }
 }
 
@@ -124,22 +123,20 @@ impl Hittable for BvhNode {
     /// Check if the bounding box for a node is hit, and if so, recursively check its children
     /// to determine which child was hit (if any).
     /// Returns a `HitRecord` for the deepest node that was hit
-    fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         // first check if the hittable's bounding box was hit
-        if self.bbox.hit(r, t_min, t_max).is_none() {
-            return None;
-        }
+        self.bbox.hit(ray, t_min, t_max)?;
 
         // check if the left and right children are hit. The hittable being checked could be
         // a BvhNode, or some other Hittable, like a primitive (sphere etc...)
-        let hit_left = self.left.hit(r, t_min, t_max);
+        let hit_left = self.left.hit(ray, t_min, t_max);
         let hit_right = if let Some(hit_rec) = &hit_left {
-            self.right.hit(r, t_min, hit_rec.t)
+            self.right.hit(ray, t_min, hit_rec.t)
         } else {
-            self.right.hit(r, t_min, t_max)
+            self.right.hit(ray, t_min, t_max)
         };
 
-        return if hit_right.is_some() {
+        if hit_right.is_some() {
             hit_right
         } else if hit_left.is_some() {
             hit_left

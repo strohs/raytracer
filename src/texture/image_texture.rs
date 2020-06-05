@@ -21,11 +21,11 @@ impl ImageTexture {
 
     pub fn from(file_name: &str) -> Self {
         let img: DynamicImage = image::open(file_name)
-            .expect(&format!("could not load image at {}", file_name));
+            .unwrap_or_else(|_| panic!("could not load image at {}", file_name));
         let (width, height) = img.dimensions();
         let data: Vec<u8> = img.into_rgb().into_vec();
         let bytes_per_scanline = width * BYTES_PER_PIXEL;
-        
+
         Self {
             data,
             width,

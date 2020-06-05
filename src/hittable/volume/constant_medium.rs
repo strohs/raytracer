@@ -51,19 +51,9 @@ impl Hittable for ConstantMedium {
         const ENABLE_DEBUG: bool = false;
         let debugging: bool = ENABLE_DEBUG && rand::thread_rng().gen::<f64>() < 0.00001;
 
-        let mut rec1 =
-            if let Some(hit_rec) = self.boundary.hit(r, f64::NEG_INFINITY, f64::INFINITY) {
-                hit_rec
-            } else {
-                return None;
-            };
+        let mut rec1 = self.boundary.hit(r, f64::NEG_INFINITY, f64::INFINITY)?;
 
-        let mut rec2 =
-            if let Some(hit_rec) = self.boundary.hit(r, rec1.t + 0.00001, f64::INFINITY) {
-                hit_rec
-            } else {
-                return None;
-            };
+        let mut rec2 = self.boundary.hit(r, rec1.t + 0.00001, f64::INFINITY)?;
 
         if debugging { println!("nt0={:?} t1={:?}", &rec1.t, &rec2.t) }
 
@@ -82,7 +72,7 @@ impl Hittable for ConstantMedium {
         let hit_distance = self.neg_inv_density * rand::thread_rng().gen::<f64>().ln();
 
         if hit_distance > distance_inside_boudary {
-            return None;
+            None
         } else {
             let t = rec1.t + hit_distance / ray_length;
             let p = r.at(t);

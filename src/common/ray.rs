@@ -11,11 +11,11 @@ pub struct Ray {
 impl Ray {
 
     /// construct a new Ray with the given `origin`, `direction`, and `time`
-    pub fn new(origin: Point3, direction: Vec3, time: f64) -> Self {
+    pub fn new(orig: Point3, dir: Vec3, time: f64) -> Self {
         Self {
-            orig: origin,
-            dir: direction,
-            time: time,
+            orig,
+            dir,
+            time,
         }
     }
 

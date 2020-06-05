@@ -35,7 +35,7 @@ impl Texture for CheckerTexture {
             * f64::sin(10.0 * p.y())
             * f64::sin(10.0 * p.z());
 
-        return if sines < 0.0 {
+        if sines < 0.0 {
             self.odd.value(u,v,p)
         } else {
             self.even.value(u,v,p)

@@ -9,7 +9,7 @@ use crate::hittable::{Hittable, BvhNode, HittableList};
 // max recursion depth allowed when bouncing rays of hittables
 const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
 // maximum samples to use, per pixel, when anti-aliasing
-const MAX_SAMPLES_PER_PIXEL: u32 = 1000;
+const MAX_SAMPLES_PER_PIXEL: u32 = 500;
 
 
 /// Renders an image using the provided `Camera` and `World`. `num_workers` is the number of
@@ -36,24 +36,23 @@ pub fn render(camera: Camera,
     let rx = {
         let (tx, rx) = channel();
 
-        // traverse the image from lower left corner to upper right and generate pixel rendering jobs
-        for j in (0..image_height).rev() {
-            for i in 0..image_width {
-                let tx = Sender::clone(&tx);
-                let world = Arc::clone(&bvh);
-                let camera = Arc::clone(&camera);
+        // traverse the image from upper left corner to lower right corner and generate pixel
+        // render jobs
+        for row in 0..image_height {
+            let tx = Sender::clone(&tx);
+            let world = Arc::clone(&bvh);
+            let camera = Arc::clone(&camera);
 
-                pool.execute(move || {
-                    let pixel_color = multi_sample_pixel(i, j,
-                                                         &camera,
-                                                         &*world,
-                                                         image_width, image_height);
-                    tx.send((i, j, pixel_color)).expect("error occurred rendering pixel");
-                });
-            }
+            pool.execute(move || {
+                let row_colors = render_scanline(row,
+                                                     &camera,
+                                                     &*world,
+                                                     image_width, image_height);
+                tx.send((row, row_colors)).expect("error occurred rendering pixel");
+            });
         }
-        println!("submitted {} pixel render jobs with a thread pool size = {}",
-                 image_width * image_height,
+        println!("submitted {} scanline render jobs with a thread pool size = {}",
+                 image_height,
                  num_workers);
         rx
     };
@@ -62,9 +61,12 @@ pub fn render(camera: Camera,
     let mut image: Vec<Color> = vec![Color::default(); (image_width * image_height) as usize];
 
     // read finished jobs data from the channel and store in image vector
-    for (pixel_col, pixel_row, pixel_color) in rx.iter() {
-        let idx = (pixel_row * image_width + pixel_col) as usize;
-        image[idx] = pixel_color;
+    for (row, row_colors) in rx.iter() {
+        let ridx = (row * image_width) as usize;
+        let image_slice = &mut image[ridx..(ridx + image_width as usize)];
+        for (i, color) in row_colors.into_iter().enumerate() {
+            image_slice[i] = color;
+        }
     }
 
     image
@@ -91,16 +93,16 @@ fn ray_color<T: Hittable + ?Sized>(
         let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
 
         if let Some(scatter_rec) = rec.mat_ptr.scatter(r, rec) {
-            return emitted
+            emitted
                 + scatter_rec.attenuation
                 * ray_color(&scatter_rec.scattered, world, background, depth - 1)
         } else {
-            return emitted;
+            emitted
         }
 
     } else {
         // nothing hit, return the background color
-        return *background;
+        *background
     }
 }
 
@@ -129,4 +131,36 @@ fn multi_sample_pixel<T: Hittable + ?Sized>(
     }
 
     color::multi_sample(&pixel_color, MAX_SAMPLES_PER_PIXEL)
+}
+
+
+/// Computes the color of a row (scanline) of pixels. `row` is the current row being rendered,
+/// where row ranges from 0..image_height
+/// Returns a Vector containing the final pixel colors of the row
+fn render_scanline<T: Hittable + ?Sized>(
+    row: u32,
+    camera: &Camera,
+    world: &T,
+    image_width: u32,
+    image_height: u32) -> Vec<Color>
+{
+    let mut rng = rand::thread_rng();
+    let mut colors: Vec<Color> = Vec::with_capacity(image_width as usize);
+
+    for col in 0..image_width {
+        let mut pixel_color = Color::default();
+        let background = Color::default();
+
+        for _ in 0..MAX_SAMPLES_PER_PIXEL {
+            // u,v are offsets that randomly choose a point close to the current pixel
+            let u = (col as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
+            let v = (row as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
+
+            let r: Ray = camera.get_ray(u, v);
+
+            pixel_color += ray_color(&r, world, &background, MAX_RAY_BOUNCE_DEPTH);
+        }
+        colors.push(color::multi_sample(&pixel_color, MAX_SAMPLES_PER_PIXEL));
+    }
+    colors
 }

@@ -17,7 +17,7 @@ impl FlipFace {
 
 impl Hittable for FlipFace {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        return if let Some(mut hit_rec) = self.ptr.hit(&r, t_min, t_max) {
+        if let Some(mut hit_rec) = self.ptr.hit(&r, t_min, t_max) {
             hit_rec.front_face = !hit_rec.front_face;
             Some(hit_rec)
         } else {

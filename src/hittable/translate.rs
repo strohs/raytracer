@@ -35,7 +35,7 @@ impl Hittable for Translate {
             r.direction(),
             r.time());
 
-        return match self.ptr.hit(&moved_r, t_min, t_max) {
+        match self.ptr.hit(&moved_r, t_min, t_max) {
             Some(mut rec) => {
                 rec.p += self.offset;
                 rec.set_face_normal(&moved_r, &rec.normal.clone());
@@ -46,7 +46,7 @@ impl Hittable for Translate {
     }
 
     fn bounding_box(&self, t0: f64, t1: f64) -> Option<Aabb> {
-        return match self.ptr.bounding_box(t0, t1) {
+        match self.ptr.bounding_box(t0, t1) {
             Some(bbox) => Some(Aabb::new(
                 bbox.min() + self.offset,
                 bbox.max() + self.offset)),

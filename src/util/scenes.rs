@@ -250,11 +250,11 @@ pub fn build_two_perlin_spheres_with_light_source(image_width: u32, aspect_ratio
     let sphere1 = build_perlin_sphere(
         Point3::new(0.,-1000., 0.),
         1000.,
-        0.5);
+        0.1);
     let sphere2 = build_perlin_sphere(
         Point3::new(0.,2., 0.),
         2.,
-        0.5);
+        0.1);
 
     // build the rectangle light source, colors are brighter than 1,1,1 so that it's bright enough to light things
     let xy_rect = build_xy_diff_light(
@@ -440,7 +440,8 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // camera settings
-    let look_from = Point3::new(278.0, 278.0, -800.0);
+    let look_from = Point3::new(178.0, 278.0, -800.0);
+
     let look_at = Point3::new(278.0, 278.0, 0.0);
     let vup = Vec3::new(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
@@ -516,7 +517,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
         10.);
     objects.add(Arc::new(metal_sphere));
 
-    // build a "foggy", sphere
+    // build a blueish, glass sphere, and make it foggy
     let sphere_boundary: Arc<dyn Hittable> = Arc::new(build_dielectric_sphere(
         Point3::new(360., 150., 145.),
         70.,
@@ -543,7 +544,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     let perlin_sphere = build_perlin_sphere(
         Point3::new(220., 280., 300.),
         80.0,
-        0.1);
+        0.5);
     objects.add(Arc::new(perlin_sphere));
 
     // build a box composed of ~1000 smaller spheres
@@ -557,7 +558,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
         box_of_sphere.add(sphere);
     }
 
-    // add the box of spheres to a BVH and then translate and rotate the entire box of spheres
+    // add the box of spheres to a BVH and then rotate and translate the entire box of spheres
     let sphere_box = BvhNode::from(&mut box_of_sphere, 0.0, 1.0);
     let rotated_spheres: Arc<dyn Hittable> = Arc::new(
         RotateY::from(Arc::new(sphere_box), 15.0));

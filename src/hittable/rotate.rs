@@ -64,7 +64,7 @@ impl Hittable for RotateY {
 
         let rotated_r = Ray::new(origin, direction, r.time());
         
-        return if let Some(mut rec) = self.ptr.hit(&rotated_r, t_min, t_max) {
+        if let Some(mut rec) = self.ptr.hit(&rotated_r, t_min, t_max) {
             let mut p = rec.p;
             let mut normal = rec.normal;
 
