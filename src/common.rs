@@ -7,6 +7,9 @@ pub use ray::*;
 pub mod camera;
 pub use camera::*;
 
+pub mod camera_builder;
+pub use camera_builder::*;
+
 pub mod color;
 pub use color::Color;
 

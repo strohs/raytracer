@@ -5,8 +5,8 @@ use std::fmt::Formatter;
 
 const POINT_COUNT: usize = 256;
 
-/// A helper struct that can be used to generate Perlin noise via a call to the
-/// `perlin_noise(p: Point3)` method of this struct
+/// A helper struct that can be used to generate random Perlin noise via a call to the
+/// `perlin_noise(p: Point3)` method of this struct.
 pub struct Perlin {
     perm_x: [i32; POINT_COUNT],
     perm_y: [i32; POINT_COUNT],
@@ -46,7 +46,7 @@ impl Perlin {
     /// it takes a 3D point as input, `point`, and always returns the same "randomish number".
     /// Nearby points should return similar numbers. Another important part of Perlin noise is
     /// that it be simple and fast, so it’s usually done as a hack...
-    pub fn perlin_noise(&self, point: &Point3) -> f64 {
+    pub fn noise(&self, point: &Point3) -> f64 {
         let u = point.x() - point.x().floor();
         let v = point.y() - point.y().floor();
         let w = point.z() - point.z().floor();
@@ -60,13 +60,14 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    let i1d = di + 2 * (dj + 2 * dk);
                     let idx = (
                         self.perm_x[(i + di) & 255] ^
                             self.perm_y[(j + dj) & 255] ^
                             self.perm_z[(k + dk) & 255]) as usize;
 
-                    c[i1d] = self.rand_vecs[idx];
+
+                    let c_idx = di + 2 * (dj + 2 * dk);
+                    c[c_idx] = self.rand_vecs[idx];
                 }
             }
         }
@@ -82,7 +83,7 @@ impl Perlin {
         let mut weight = 1.0;
 
         for _i in 0..depth {
-            accum += weight * self.perlin_noise(&temp_p);
+            accum += weight * self.noise(&temp_p);
             weight *= 0.5;
             temp_p *= 2.0;
         }
@@ -115,12 +116,11 @@ fn perlin_interp(
     let uu = u * u * (3.0 - 2.0 * u);
     let vv = v * v * (3.0 - 2.0 * v);
     let ww = w * w * (3.0 - 2.0 * w);
-    
-    let mut accum = 0.0;
 
-    for i in 0..2 {
-        for j in 0..2 {
-            for k in 0..2 {
+    let mut accum = 0.0;
+    for i in 0..2_usize {
+        for j in 0..2_usize {
+            for k in 0..2_usize {
                 let idx = i + 2 * (j + 2 * k);
                 let weight_v = Vec3::new(u - i as f64, v - j as f64, w - k as f64);
                 accum += (i as f64 * uu + (1.0 - i as f64) * (1.0 - uu))
@@ -130,6 +130,7 @@ fn perlin_interp(
             }
         }
     }
+
     accum
 }
 
@@ -144,5 +145,22 @@ impl std::fmt::Debug for Perlin {
             .field("perm_y", &format_args!("{:?}...", &self.perm_y[0..5]))
             .field("perm_z", &format_args!("{:?}...", &self.perm_z[0..5]))
             .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::texture::Perlin;
+
+    #[test]
+    fn create_a_default_perlin() {
+        let p = Perlin::default();
+        dbg!(p);
+    }
+
+    #[test]
+    fn generate_a_new_perlin() {
+        let p = Perlin::new();
+        dbg!(p);
     }
 }
