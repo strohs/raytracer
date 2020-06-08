@@ -1,8 +1,11 @@
 use crate::common::{Point3, Vec3, Ray};
 use rand::{Rng};
 
-/// A positionable camera with a configurable vertical field of view, aperture, focus distance,
+/// A positionable `Camera` with a configurable vertical field of view, aperture, focus distance,
 /// and shutter open/close time.
+///
+/// All `Ray`s in this ray-tracer originate from the `Camera` via calls to its `get_ray(s,t)`
+/// function
 #[allow(dead_code)]
 #[derive(Default, Debug, Copy, Clone)]
 pub struct Camera {

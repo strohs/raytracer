@@ -19,7 +19,8 @@ const MAX_SAMPLES_PER_PIXEL: u32 = 1000;
 ///
 /// # Returns
 /// a Vector of `Color` representing the final color of each pixel in the image.
-/// The image is stored row by row,  from top left of the image to the bottom right
+/// The colors of the image are stored in row major format, starting from top left
+/// to the bottom right
 pub fn render(camera: Camera,
               mut world: HittableList,
               num_workers: usize,
@@ -76,7 +77,7 @@ pub fn render(camera: Camera,
 /// determine if a Ray has hit a `Hittable` object in the `world` and compute the pixel color
 /// of the Ray, `r`. The Hittable's `Material` is taken into account when performing ray bouncing
 /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
-/// was hit, than a linearly blended "sky" color is returned
+/// was hit then the `background` color is returned, than a linearly blended "sky" color is returned
 fn ray_color<T: Hittable + ?Sized>(
     r: &Ray,
     world: &T,
@@ -88,8 +89,8 @@ fn ray_color<T: Hittable + ?Sized>(
         return Color::default();
     }
 
-    // if a hittable in the world was hit, determine if its material will scatter the incoming
-    // ray, AND if its material emits light
+    // if a hittable was hit, determine if its material will scatter the incoming
+    // ray, AND how much light the material emits
     if let Some(ref rec) = world.hit(r, 0.001, f64::INFINITY) {
         let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
 
@@ -105,33 +106,6 @@ fn ray_color<T: Hittable + ?Sized>(
         // nothing hit, return the background color
         *background
     }
-}
-
-/// Computes the color of the pixel located at `pw,ph` (pixel width, pixel height) by sampling
-/// the pixels around it.
-fn multi_sample_pixel<T: Hittable + ?Sized>(
-    pw: u32,
-    ph: u32,
-    camera: &Camera,
-    world: &T,
-    image_width: u32,
-    image_height: u32) -> Color
-{
-    let mut rng = rand::thread_rng();
-    let mut pixel_color = Color::default();
-    let background = Color::default();
-
-    for _ in 0..MAX_SAMPLES_PER_PIXEL {
-        // u,v are offsets that randomly choose a point close to the current pixel
-        let u = (pw as f64 + rng.gen::<f64>()) / (image_width - 1) as f64;
-        let v = (ph as f64 + rng.gen::<f64>()) / (image_height - 1) as f64;
-
-        let r: Ray = camera.get_ray(u, v);
-
-        pixel_color += ray_color(&r, world, &background, MAX_RAY_BOUNCE_DEPTH);
-    }
-
-    color::multi_sample(&pixel_color, MAX_SAMPLES_PER_PIXEL)
 }
 
 
