@@ -3,7 +3,7 @@ use rand::Rng;
 use crate::common::{Color, Point3, Vec3, Camera, CameraBuilder};
 use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRect, XZRect, FlipFace, BoxInst, RotateY, Translate, ConstantMedium, BvhNode};
 use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
-use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, ImageTexture};
+use crate::texture::{Texture, SolidColor, CheckerTexture, NoiseTexture, ImageTexture};
 
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
 /// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
@@ -38,12 +38,12 @@ fn generate_random_spheres() -> HittableList {
 
     let mut world = HittableList::new();
 
-    // a big, Lambertian grey, sphere that will act at the ground
-    let checker_tex: Arc<dyn Texture> = Arc::new(CheckerTexture::from(
-        Arc::new(SolidColor::from_rgb(0.2, 0.3, 0.1)),
-        Arc::new(SolidColor::from_rgb(0.9, 0.9, 0.9))));
-    let ground_material: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&checker_tex)));
-    let ground_sphere = Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, ground_material);
+    // a big, checkered sphere that will act at the ground
+    let ground_sphere = build_checker_sphere(
+        Point3::new(0.0, -1000.0, 0.0),
+        1000.0,
+        Color::new(0.1,0.2,0.1),
+        Color::new(0.8,0.8,0.8));
     world.add(Arc::new(ground_sphere));
 
     // generate 484 spheres with random materials and colors, all of radius 0.2
@@ -95,20 +95,22 @@ fn generate_random_spheres() -> HittableList {
     }
 
     // add a single, larger glass sphere
-    let mat1: Arc<dyn Material> = Arc::new(Dielectric::new(1.5));
-    let sphere1: Arc<dyn Hittable> = Arc::new(Sphere::new(Point3::new(0., 1., 0.), 1.0, Arc::clone(&mat1)));
-    world.add(sphere1);
+    let glass_shere = build_dielectric_sphere(Point3::new(0.0, 1.0, 0.0), 1.0, 1.5);
+    world.add(Arc::new(glass_shere));
 
-    // add a single, lambertian reddish colored sphere
-    let tex2: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(1.0, 0.1, 0.1));
-    let mat2: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&tex2)));
-    let sphere2: Arc<dyn Hittable> = Arc::new(Sphere::new(Point3::new(-4., 1., 0.), 1.0, Arc::clone(&mat2)));
-    world.add(sphere2);
+    // add a sphere with perlin noise
+    let perlin_sphere = build_perlin_sphere(Point3::new(-4., 1., 0.), 1.0, 0.9);
+    //let tex2: Arc<dyn Texture> = Arc::new(SolidColor::from_rgb(1.0, 0.1, 0.1));
+    //let mat2: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&tex2)));
+    //let sphere2: Arc<dyn Hittable> = Arc::new(Sphere::new(Point3::new(-4., 1., 0.), 1.0, Arc::clone(&mat2)));
+    world.add(Arc::new(perlin_sphere));
 
     // add a single metal sphere (tan color)
-    let mat3: Arc<dyn Material> = Arc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0));
-    let sphere3: Arc<dyn Hittable> = Arc::new(Sphere::new(Point3::new(4., 1., 0.), 1.0, Arc::clone(&mat3)));
-    world.add(sphere3);
+    let metal_sphere = build_metal_sphere(
+        Point3::new(4., 1., 0.),
+        1.0,
+        Color::new(0.7, 0.6, 0.5), 0.0);
+    world.add(Arc::new(metal_sphere));
 
     world
 }
@@ -131,13 +133,17 @@ pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
         .build();
 
     // generate two checkered spheres
-    let check_tex: Arc<dyn Texture> = Arc::new(
-        CheckerTexture::from(
-            Arc::new(SolidColor::from_rgb(0.2, 0.3, 0.1)),
-            Arc::new(SolidColor::from_rgb(0.9, 0.9, 0.9))));
-    let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&check_tex)));
-    let sphere1 = Sphere::new(Point3::new(0., -10., 0.), 10., Arc::clone(&lamb));
-    let sphere2 = Sphere::new(Point3::new(0., 10., 0.), 10., Arc::clone(&lamb));
+    let sphere1 = build_checker_sphere(
+        Point3::new(0., -10., 0.),
+        10.,
+        Color::new(0.2,0.3,0.1),
+        Color::new(0.9,0.9,0.9));
+
+    let sphere2 = build_checker_sphere(
+        Point3::new(0., 10., 0.),
+        10.,
+        Color::new(0.2,0.2,0.2),
+        Color::new(0.8,0.8,0.8));
 
     let mut world = HittableList::new();
     world.add(Arc::new(sphere1));
@@ -165,7 +171,7 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
         .build();
 
     // generate two checkered spheres
-    let perlin_tex: Arc<dyn Texture> = Arc::new(NoiseTexture::new(Perlin::new(), 2.));
+    let perlin_tex: Arc<dyn Texture> = Arc::new(NoiseTexture::new(0.8));
     let lamb: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&perlin_tex)));
     let sphere1 = Sphere::new(Point3::new(0., -1000., 0.), 1000., Arc::clone(&lamb));
     let sphere2 = Sphere::new(Point3::new(0., 2., 0.), 2., Arc::clone(&lamb));
@@ -624,7 +630,17 @@ fn build_earth_sphere(center: Point3, rad: f64) -> Sphere {
 
 /// Returns a new sphere with a perlin noise texture
 fn build_perlin_sphere(center: Point3, rad: f64, noise_scale: f64) -> Sphere {
-    let pertex = NoiseTexture::new(Perlin::new(), noise_scale);
+    let pertex = NoiseTexture::new(noise_scale);
     let permat = Lambertian::new(Arc::new(pertex));
     Sphere::new(center, rad, Arc::new(permat))
+}
+
+/// Returns a new sphere with a checker board texture
+fn build_checker_sphere(center: Point3, rad: f64, even: Color, odd: Color) -> Sphere {
+    let even = SolidColor::from(even);
+    let odd = SolidColor::from(odd);
+    let tex = CheckerTexture::from(Arc::new(even), Arc::new(odd));
+    let mat = Lambertian::new(Arc::new(tex));
+
+    Sphere::new(center, rad, Arc::new(mat))
 }

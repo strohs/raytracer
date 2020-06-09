@@ -7,10 +7,10 @@ use raytracer::common::Color;
 
 fn main() {
     // aspect ratio for final image
-    let aspect_ratio = 16.0 / 9.0;
+    let aspect_ratio = 16.0 / 10.0;
 
     // desired image width
-    let image_width = 1280;
+    let image_width = 800;
 
 
     // random sphere scene
@@ -19,7 +19,15 @@ fn main() {
     //     world, camera,
     //     BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
     //     50,
-    //     500);
+    //     1000);
+
+    // two checkered spheres
+    // let (camera, world) = scenes::build_two_checkered_spheres(image_width, aspect_ratio);
+    // let rjob = RenderJob::from(
+    //     world, camera,
+    //     BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
+    //     50,
+    //     1000);
 
 
     // two perlin spheres stacked on top of each other
@@ -28,7 +36,7 @@ fn main() {
     //     world, camera,
     //     BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
     //     50,
-    //     500);
+    //     1000);
 
 
     // build a textured earth sphere
@@ -53,22 +61,22 @@ fn main() {
     //     scenes::build_cornell_smoke_box(image_width, aspect_ratio);
 
 
-    let (camera, world) =
-        scenes::build_cornell_box_with_two_boxes(image_width, aspect_ratio);
-    let rjob = RenderJob::from(
-        world, camera,
-        BackgroundColor::Solid(Color::default()),
-        50,
-        1000);
-
-    // build final scene
     // let (camera, world) =
-    //     scenes::build_final_scene(image_width, aspect_ratio);
+    //     scenes::build_cornell_box_with_two_boxes(image_width, aspect_ratio);
     // let rjob = RenderJob::from(
     //     world, camera,
     //     BackgroundColor::Solid(Color::default()),
     //     50,
-    //     500);
+    //     1000);
+
+    // build final scene
+    let (camera, world) =
+        scenes::build_final_scene(image_width, aspect_ratio);
+    let rjob = RenderJob::from(
+        world, camera,
+        BackgroundColor::Solid(Color::default()),
+        50,
+        500);
 
 
     // number of worker threads to spin up
@@ -77,7 +85,9 @@ fn main() {
     let now = Instant::now();
     println!("rendering {}x{} image. bounce_depth:{}  samples_per_pixel:{}",
              &camera.image_width, &camera.image_height, &rjob.ray_bounce_depth, &rjob.samples_per_pixel);
+
     let image = renderer::render(rjob, pool_size);
+
     println!("done, total elapsed {:.3} secs", now.elapsed().as_secs_f64());
 
     // write the image data to a PPM file

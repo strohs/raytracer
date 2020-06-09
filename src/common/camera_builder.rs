@@ -46,9 +46,9 @@ impl CameraBuilder {
         *self
     }
 
-    /// Sets this camera's vertical field of view
-    pub fn vertical_field_of_view(&mut self, vfov: f64) -> Self {
-        self.vfov = vfov;
+    /// Sets this camera's vertical field of view, **given in degrees**
+    pub fn vertical_field_of_view(&mut self, vfov_degrees: f64) -> Self {
+        self.vfov = vfov_degrees;
         *self
     }
 

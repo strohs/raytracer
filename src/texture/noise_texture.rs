@@ -14,8 +14,10 @@ impl NoiseTexture {
     /// Creates a new Noise texture
     /// `perlin` is the Perlin noise generator to use
     /// `scale` is the amount to scale the input point by, in order to vary it more quickly
-    pub fn new(noise: Perlin, scale: f64) -> Self {
-        Self { noise, scale }
+    pub fn new(scale: f64) -> Self {
+        Self {
+            noise: Perlin::new(),
+            scale }
     }
 }
 
