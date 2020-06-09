@@ -6,10 +6,6 @@ use rand::{Rng};
 use crate::common::{Ray, Color, Camera, color};
 use crate::hittable::{Hittable, BvhNode, HittableList};
 
-// max recursion depth allowed when bouncing rays of hittables
-//const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
-// maximum samples to use, per pixel, when anti-aliasing
-//const MAX_SAMPLES_PER_PIXEL: u32 = 500;
 
 #[derive(Debug, Copy, Clone)]
 pub enum BackgroundColor {

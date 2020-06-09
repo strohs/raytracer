@@ -7,10 +7,10 @@ use raytracer::common::Color;
 
 fn main() {
     // aspect ratio for final image
-    let aspect_ratio = 16.0 / 10.0;
+    let aspect_ratio = 16.0 / 9.0;
 
     // desired image width
-    let image_width = 800;
+    let image_width = 640;
 
 
     // random sphere scene
@@ -37,6 +37,7 @@ fn main() {
     //     BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
     //     50,
     //     1000);
+
 
 
     // build a textured earth sphere
@@ -77,7 +78,6 @@ fn main() {
         BackgroundColor::Solid(Color::default()),
         50,
         500);
-
 
     // number of worker threads to spin up
     let pool_size = num_cpus::get_physical();

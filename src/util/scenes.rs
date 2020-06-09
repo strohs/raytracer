@@ -529,7 +529,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     let perlin_sphere = build_perlin_sphere(
         Point3::new(220., 280., 300.),
         80.0,
-        0.5);
+        0.2);
     objects.add(Arc::new(perlin_sphere));
 
     // build a box composed of ~1000 smaller spheres
@@ -557,7 +557,32 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     (camera, objects)
 }
 
-
+// pub fn build_perlin(image_width: u32, aspect_ratio: f64) -> (Camera, HittableList) {
+//     // build the camera
+//     let camera = CameraBuilder::new()
+//         .look_from(Point3::new(178.0, 278.0, -800.0))
+//         .look_at(Point3::new(278.0, 278.0, 0.0))
+//         .up_direction(Vec3::new(0.0, 1.0, 0.0))
+//         .aspect_ratio(aspect_ratio)
+//         .image_width(image_width)
+//         .focus_distance(10.0)
+//         .aperture(0.0)
+//         .vertical_field_of_view(40.0)
+//         .open_close_time(0.0, 1.0)
+//         .build();
+//
+//     // objects will hold all the hittables in this scene
+//     let mut objects = HittableList::new();
+//
+//     // build a sphere with perlin noise texture
+//     let perlin_sphere = build_perlin_sphere(
+//         Point3::new(220., 280., -400.0),
+//         80.0,
+//         0.2);
+//     objects.add(Arc::new(perlin_sphere));
+//
+//     (camera, objects)
+// }
 
 
 
