@@ -10,6 +10,7 @@ pub struct CameraBuilder {
     vup: Vec3,
     vfov: f64,
     aspect_ratio: f64,
+    image_width: u32,
     aperture: f64,
     focus_dist: f64,
     open_time: f64,
@@ -57,6 +58,12 @@ impl CameraBuilder {
         *self
     }
 
+    /// Sets the desired image_width for the final rendered image
+    pub fn image_width(&mut self, image_width: u32) -> Self {
+        self.image_width = image_width;
+        *self
+    }
+
     /// Sets the camera's aperture, which, when used in combination with `focus distance`,
     /// can achieve a de-focus blur effect on objects beyond the focal distance.
     pub fn aperture(&mut self, aperture: f64) -> Self {
@@ -100,6 +107,8 @@ impl CameraBuilder {
         let lens_radius = self.aperture / 2.0;
 
         Camera {
+            image_width: self.image_width,
+            image_height: (self.image_width as f64 / self.aspect_ratio) as u32,
             look_from: self.look_from,
             open_time: self.open_time,
             close_time: self.close_time,

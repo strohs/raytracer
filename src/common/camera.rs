@@ -9,6 +9,8 @@ use rand::{Rng};
 #[allow(dead_code)]
 #[derive(Default, Debug, Copy, Clone)]
 pub struct Camera {
+    pub image_width: u32,
+    pub image_height: u32,
     pub look_from: Point3,  // origin
     pub lens_radius: f64,
     pub lower_left_corner: Point3,
@@ -37,6 +39,5 @@ impl Camera {
 
         Ray::new(self.look_from + offset, direction, shutter_open)
     }
-
 
 }

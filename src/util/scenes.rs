@@ -9,16 +9,16 @@ use crate::texture::{Texture, SolidColor, CheckerTexture, Perlin, NoiseTexture, 
 /// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
 /// texture, which acts as the ground plane
 pub fn build_random_sphere_scene(image_width: u32, aspect_ratio: f64)
-    -> (Camera, HittableList, u32, u32)
+    -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(13.0, 2.0, 3.0))
         .look_at(Point3::new(0.0, 0.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(20.0)
@@ -28,7 +28,7 @@ pub fn build_random_sphere_scene(image_width: u32, aspect_ratio: f64)
     // generate a world with spheres in random locations
     let world = generate_random_spheres();
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 /// generates a random "world" containing 484 spheres of various colors and materials on top of
@@ -115,16 +115,15 @@ fn generate_random_spheres() -> HittableList {
 
 /// builds a scene with two checkered spheres on top of each other
 pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
-    -> (Camera, HittableList, u32, u32)
+    -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
-
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(13.0, 2.0, 3.0))
         .look_at(Point3::new(0.0, 0.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(20.0)
@@ -144,21 +143,21 @@ pub fn build_two_checkered_spheres(image_width: u32, aspect_ratio: f64)
     world.add(Arc::new(sphere1));
     world.add(Arc::new(sphere2));
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 /// builds a scene with two checkered spheres on top of each other
 pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
-                                   -> (Camera, HittableList, u32, u32)
+                                   -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(13.0, 2.0, 3.0))
         .look_at(Point3::new(0.0, 0.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(20.0)
@@ -175,22 +174,22 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64)
     world.add(Arc::new(sphere1));
     world.add(Arc::new(sphere2));
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 /// builds a scene with two checkered spheres on top of each other
 ///
 pub fn build_earth_scene(image_width: u32, aspect_ratio: f64, file_path: &str)
-                                -> (Camera, HittableList, u32, u32)
+                                -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(13.0, 2.0, 3.0))
         .look_at(Point3::new(0.0, 0.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(30.0)
@@ -205,21 +204,20 @@ pub fn build_earth_scene(image_width: u32, aspect_ratio: f64, file_path: &str)
     let mut world = HittableList::new();
     world.add(Arc::new(sphere));
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 /// builds a scene with two perlin spheres, and a xy_rectangle light source
 pub fn build_two_perlin_spheres_with_light_source(image_width: u32, aspect_ratio: f64)
-                                                  -> (Camera, HittableList, u32, u32)
+                                                  -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
-
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(13.0, 2.0, 3.0))
         .look_at(Point3::new(0.0, 0.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(60.0)
@@ -250,24 +248,23 @@ pub fn build_two_perlin_spheres_with_light_source(image_width: u32, aspect_ratio
     world.add(Arc::new(xy_rect));
     world.add(Arc::new(xz_rect));
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 
 
 /// builds a cornell box containing two boxes
 pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
-                                        -> (Camera, HittableList, u32, u32)
+                                        -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
-
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(278.0, 278.0, -800.0))
         .look_at(Point3::new(278.0, 278.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
         .focus_distance(10.0)
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .aperture(0.0)
         .vertical_field_of_view(40.0)
         .open_close_time(0.0, 1.0)
@@ -293,7 +290,7 @@ pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
     let light = Arc::new(build_xz_diff_light(
         Color::new(16.,16.,16.),
         183., 373.,
-        197., 362.,
+        137., 302.,
         554.));
 
     // build a rectangular box
@@ -338,23 +335,23 @@ pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
     world.add(square_box);
     world.add(per_sphere);
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 
 
 /// builds a cornell box, containing two boxes, one made of smoke and the other of fog.
 pub fn build_cornell_smoke_box(image_width: u32, aspect_ratio: f64)
-                               -> (Camera, HittableList, u32, u32)
+                               -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(278.0, 278.0, -800.0))
         .look_at(Point3::new(278.0, 278.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(40.0)
@@ -416,22 +413,22 @@ pub fn build_cornell_smoke_box(image_width: u32, aspect_ratio: f64)
     world.add(fog_box);
     world.add(smoke_box);
 
-    (camera, world, image_width, image_height)
+    (camera, world)
 }
 
 
 /// Returns the camera and HittableList for the final scene from "Raytracing the Next Week".
 pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
-                               -> (Camera, HittableList, u32, u32)
+                               -> (Camera, HittableList)
 {
-    let image_height = (image_width as f64 / aspect_ratio) as u32;
 
     // build the camera
     let camera = CameraBuilder::new()
         .look_from(Point3::new(178.0, 278.0, -800.0))
         .look_at(Point3::new(278.0, 278.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
-        .aspect_ratio(16.0 / 9.0)
+        .aspect_ratio(aspect_ratio)
+        .image_width(image_width)
         .focus_distance(10.0)
         .aperture(0.0)
         .vertical_field_of_view(40.0)
@@ -551,7 +548,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     objects.add(translated_spheres);
 
 
-    (camera, objects, image_width, image_height)
+    (camera, objects)
 }
 
 
