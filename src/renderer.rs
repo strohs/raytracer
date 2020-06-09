@@ -9,7 +9,7 @@ use crate::hittable::{Hittable, BvhNode, HittableList};
 // max recursion depth allowed when bouncing rays of hittables
 const MAX_RAY_BOUNCE_DEPTH: u32 = 50;
 // maximum samples to use, per pixel, when anti-aliasing
-const MAX_SAMPLES_PER_PIXEL: u32 = 1000;
+const MAX_SAMPLES_PER_PIXEL: u32 = 500;
 
 
 /// Renders an image using the provided `Camera` and `World`. `num_workers` is the number of
