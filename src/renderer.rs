@@ -3,8 +3,9 @@ use std::sync::mpsc::{Sender, channel};
 use threadpool::ThreadPool;
 use rand::{Rng};
 
-use crate::common::{Ray, Color, Camera, color};
+use crate::common::{Ray, Color, Camera};
 use crate::hittable::{Hittable, BvhNode, HittableList};
+use crate::common;
 
 
 #[derive(Debug, Copy, Clone)]
@@ -135,7 +136,7 @@ fn render_scanline<T: Hittable + ?Sized>(
 
             pixel_color += ray_color(&r, world, background_color, ray_bounce_depth);
         }
-        colors.push(color::multi_sample(&pixel_color, samples_per_pixel));
+        colors.push(multi_sample(&pixel_color, samples_per_pixel));
     }
     colors
 }
@@ -179,7 +180,8 @@ fn ray_color<T: Hittable + ?Sized>(
     }
 }
 
-
+/// Returns a linearly blended color between `from` and `to`. The input `ray`s
+/// y coordinate to determine how much of `from` or `to` to apply.
 fn linear_blend(ray: &Ray, from: &Color, to: &Color) -> Color {
     let unit_direction = ray.direction().unit_vector();
     let t = 0.5 * (unit_direction.y() + 1.0);
@@ -187,3 +189,23 @@ fn linear_blend(ray: &Ray, from: &Color, to: &Color) -> Color {
     (1.0 - t) * *from + t * *to
 }
 
+
+/// Returns a new pixel color using multi-sample color computation
+pub fn multi_sample(pixel_color: &Color, samples_per_pixel: u32) -> Color {
+    let mut r = pixel_color.x();
+    let mut g = pixel_color.y();
+    let mut b = pixel_color.z();
+
+    // divide the color total by the number of samples and gamma correct for gamma=2.0
+    let scale = 1.0 / samples_per_pixel as f64;
+    r = f64::sqrt(scale * r);
+    g = f64::sqrt(scale * g);
+    b = f64::sqrt(scale * b);
+
+    // compute a translated [0..255] color value for each color's R,G,B
+    Color::new(
+        256.0 * common::clamp(r, 0.0, 0.999),
+        256.0 * common::clamp(g, 0.0, 0.999),
+        256.0 * common::clamp(b, 0.0, 0.999)
+    )
+}

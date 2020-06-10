@@ -7,19 +7,19 @@ use raytracer::common::Color;
 
 fn main() {
     // aspect ratio for final image
-    let aspect_ratio = 16.0 / 9.0;
+    let aspect_ratio = 1.85;
 
     // desired image width
-    let image_width = 640;
+    let image_width = 800;
 
 
     // random sphere scene
-    // let (camera, world) = scenes::build_random_sphere_scene(image_width, aspect_ratio);
-    // let rjob = RenderJob::from(
-    //     world, camera,
-    //     BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
-    //     50,
-    //     1000);
+    let (camera, world) = scenes::build_random_sphere_scene(image_width, aspect_ratio);
+    let rjob = RenderJob::from(
+        world, camera,
+        BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
+        50,
+        1000);
 
     // two checkered spheres
     // let (camera, world) = scenes::build_two_checkered_spheres(image_width, aspect_ratio);
@@ -68,16 +68,16 @@ fn main() {
     //     world, camera,
     //     BackgroundColor::Solid(Color::default()),
     //     50,
-    //     1000);
+    //     10_000);
 
     // build final scene
-    let (camera, world) =
-        scenes::build_final_scene(image_width, aspect_ratio);
-    let rjob = RenderJob::from(
-        world, camera,
-        BackgroundColor::Solid(Color::default()),
-        50,
-        500);
+    // let (camera, world) =
+    //     scenes::build_final_scene(image_width, aspect_ratio);
+    // let rjob = RenderJob::from(
+    //     world, camera,
+    //     BackgroundColor::Solid(Color::default()),
+    //     50,
+    //     10_000);
 
     // number of worker threads to spin up
     let pool_size = num_cpus::get_physical();

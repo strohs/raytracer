@@ -10,12 +10,11 @@ pub use camera::*;
 pub mod camera_builder;
 pub use camera_builder::*;
 
-pub mod color;
-pub use color::Color;
-
 /// alias for a 3D point with x,y,z coordinates
 pub type Point3 = Vec3;
 
+/// alias for a RGB color with three color components
+pub type Color = Vec3;
 
 
 
