@@ -1,6 +1,7 @@
 use crate::common::{Vec3, Point3};
 
-/// a three dimensional Ray consisting of an origin point and a direction ['Vec3'],
+/// a three dimensional Ray consisting of an origin point, a direction `dir` ['Vec3'] and
+/// a moment in `time` that the ray existed
 #[derive(Debug, Default, PartialEq, Copy, Clone)]
 pub struct Ray {
     orig: Point3,
@@ -35,7 +36,7 @@ impl Ray {
     }
 
     /// returns the point, on this Ray, **at** the "ray parameter" `t`
-    /// P(t) = A + tb
+    /// **P(t) = A + tb**
     pub fn at(&self, t: f64) -> Point3 {
         self.orig + t * self.dir
     }

@@ -5,6 +5,32 @@ use crate::hittable::{HittableList, Sphere, Hittable, MovingSphere, XYRect, YZRe
 use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, NoiseTexture, ImageTexture};
 
+/// Scene lists the available pre-made, default scenes that can be rendered
+#[derive(Debug)]
+pub enum Scene {
+    RandomSpheres,
+    CornellBox,
+    CornellSmokeBoxes,
+    PerlinSpheres,
+    Earth,
+    Final,
+}
+
+impl Scene {
+    /// Map in integer in 1..6 to a Scene
+    pub fn map_to_scene(num: u8) -> Scene {
+        match num {
+            1 => Scene::RandomSpheres,
+            2 => Scene::PerlinSpheres,
+            3 => Scene::Earth,
+            4 => Scene::CornellBox,
+            5 => Scene::CornellSmokeBoxes,
+            6 => Scene::Final,
+            _ => panic!("unknown scene number {}", num),
+        }
+    }
+}
+
 /// builds a "default" random sphere scene, containing 484 small spheres randomly positioned around
 /// 3 bigger spheres. These are then positioned on top of an enormous sphere with a checkerboard
 /// texture, which acts as the ground plane
