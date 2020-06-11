@@ -1,5 +1,4 @@
-use std::error::Error;
-use std::env;
+
 use crate::util::scenes::Scene;
 
 /// Command holds the parsed commands from the command line

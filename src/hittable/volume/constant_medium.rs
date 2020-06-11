@@ -5,7 +5,7 @@ use crate::material::{Material, Isotropic};
 use crate::texture::Texture;
 use crate::common::{Ray, Vec3};
 
-/// ConstantMedium models a volume of constant density, like smoke, fog. or mist.
+/// ConstantMedium models a volume of constant density, like smoke, fog, or mist.
 /// A `Ray` that hits it can either scatter inside the volume or go all the way through it.
 /// More thin transparent volumes, like a light fog, are more likely to have rays travel
 /// through it. How far the ray has to travel through the volume will also determine how likely

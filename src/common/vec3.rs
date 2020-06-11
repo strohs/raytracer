@@ -17,17 +17,17 @@ impl Vec3 {
         Self { x, y, z }
     }
 
-    /// return Vec3.x
+    /// returns Vec3.x
     pub fn x(&self) -> f64 {
         self.x
     }
 
-    /// return Vec3.y
+    /// returns Vec3.y
     pub fn y(&self) -> f64 {
         self.y
     }
 
-    /// return Vec3.z
+    /// returns Vec3.z
     pub fn z(&self) -> f64 {
         self.z
     }
