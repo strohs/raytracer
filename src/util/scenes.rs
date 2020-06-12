@@ -6,27 +6,27 @@ use crate::material::{Lambertian, Material, Metal, Dielectric, DiffuseLight};
 use crate::texture::{Texture, SolidColor, CheckerTexture, NoiseTexture, ImageTexture};
 
 /// Scene lists the available pre-made, default scenes that can be rendered
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum Scene {
-    RandomSpheres,
-    CornellBox,
-    CornellSmokeBoxes,
-    PerlinSpheres,
-    Earth,
-    Final,
+    RandomSpheres = 1,
+    PerlinSpheres = 2,
+    Earth = 3,
+    CornellBox = 4,
+    CornellSmokeBoxes = 5,
+    Final = 6,
 }
 
 impl Scene {
     /// Map in integer in 1..6 to a Scene
-    pub fn map_to_scene(num: u8) -> Scene {
+    pub fn map_to_scene(num: u32) -> Option<Scene> {
         match num {
-            1 => Scene::RandomSpheres,
-            2 => Scene::PerlinSpheres,
-            3 => Scene::Earth,
-            4 => Scene::CornellBox,
-            5 => Scene::CornellSmokeBoxes,
-            6 => Scene::Final,
-            _ => panic!("unknown scene number {}", num),
+            1 => Some(Scene::RandomSpheres),
+            2 => Some(Scene::PerlinSpheres),
+            3 => Some(Scene::Earth),
+            4 => Some(Scene::CornellBox),
+            5 => Some(Scene::CornellSmokeBoxes),
+            6 => Some(Scene::Final),
+            _ => None,
         }
     }
 }
@@ -347,14 +347,14 @@ pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
         Arc::clone(&square_box),
         Vec3::new(130., 0., 100.)));
 
-    // build a perlin sphere on top of the square box
-    let mut per_sphere: Arc<dyn Hittable> = Arc::new(build_perlin_sphere(
-        Point3::new(0.0, 0.0, 0.0),
-        60.0,
-        0.2));
-    per_sphere = Arc::new(Translate::from(
-        Arc::clone(&per_sphere),
-        Vec3::new(175., 225., 170.)));
+    // // build a perlin sphere on top of the square box
+    // let mut per_sphere: Arc<dyn Hittable> = Arc::new(build_perlin_sphere(
+    //     Point3::new(0.0, 0.0, 0.0),
+    //     60.0,
+    //     0.2));
+    // per_sphere = Arc::new(Translate::from(
+    //     Arc::clone(&per_sphere),
+    //     Vec3::new(175., 225., 170.)));
 
     let mut world = HittableList::new();
     world.add(green_wall);
@@ -365,7 +365,6 @@ pub fn build_cornell_box_with_two_boxes(image_width: u32, aspect_ratio: f64)
     world.add(back_wall);
     world.add(rect_box);
     world.add(square_box);
-    world.add(per_sphere);
 
     (camera, world)
 }
@@ -456,7 +455,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
 
     // build the camera
     let camera = CameraBuilder::new()
-        .look_from(Point3::new(178.0, 278.0, -800.0))
+        .look_from(Point3::new(178.0, 278.0, -400.0))
         .look_at(Point3::new(278.0, 278.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
         .aspect_ratio(aspect_ratio)
@@ -555,7 +554,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
     let perlin_sphere = build_perlin_sphere(
         Point3::new(220., 280., 300.),
         80.0,
-        0.2);
+        0.1);
     objects.add(Arc::new(perlin_sphere));
 
     // build a box composed of ~1000 smaller spheres
