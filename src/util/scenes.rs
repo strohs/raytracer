@@ -455,7 +455,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64)
 
     // build the camera
     let camera = CameraBuilder::new()
-        .look_from(Point3::new(178.0, 278.0, -400.0))
+        .look_from(Point3::new(178.0, 278.0, -800.0))
         .look_at(Point3::new(278.0, 278.0, 0.0))
         .up_direction(Vec3::new(0.0, 1.0, 0.0))
         .aspect_ratio(aspect_ratio)
