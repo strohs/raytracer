@@ -7,6 +7,8 @@ parser that allows you to render some scenes from the book at different widths, 
 ## Sample Scenes
 Here are some scenes from the book rendered at 1280x720 with samples per pixel set to 5000
 
+![final book scene](images/final_scene.jpg)
+
 ![Cornell Box](images/cornell_box.jpg)
 
 ![earth sphere](images/earth_sphere.jpg)
@@ -16,8 +18,6 @@ Here are some scenes from the book rendered at 1280x720 with samples per pixel s
 ![Perlin Sphere](images/perlin_spheres.jpg)
 
 ![Random Spheres](images/random_spheres.jpg)
-
-![final book scene](images/final_scene.jpg)
 
 
 ### Building
@@ -29,6 +29,7 @@ run the raytracer from the command line without any options:
 
 this will generate the default scene: Cornell Box, with default settings of: width=1024 pixels, 
 aspect ratio=1.77 (16:9), and samples per pixel = 500
+The final image will be saved in the same directory that you invoked the raytracer from as a **.ppm** image
 
 
 to get command line help:
