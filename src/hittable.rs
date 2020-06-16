@@ -27,7 +27,7 @@ pub use rotate::*;
 
 use crate::common::{Ray};
 
-/// A trait for objects in our scene that can be *hit* by a Ray
+/// A trait for primitives in a scene that can be *hit* by a Ray
 pub trait Hittable: Send + Sync + std::fmt::Debug {
 
     /// returns `Some(HitRecord)` if the given `[Ray]` `r`, has *hit* this hittable.
@@ -35,7 +35,6 @@ pub trait Hittable: Send + Sync + std::fmt::Debug {
     /// hit must be between `t_min and t_max`. If the Ray did not hit then `None` is returned
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 
-    // TODO see if you can give return Option<&Aabb>
     /// Computes and returns the axis-aligned bounding box `Aabb` of this hittable
     fn bounding_box(&self, t0: f64, t1: f64) -> Option<Aabb>;
 }

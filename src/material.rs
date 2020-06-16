@@ -18,9 +18,9 @@ use crate::hittable::HitRecord;
 use std::ops::Neg;
 use std::fmt::Debug;
 
-/// holds the details on how a `Material` scattered an incoming `Ray`.
-/// `attenuation` field what `Color` was applied by the material to the incoming Ray
-/// `scattered` field contains the new `Ray` that was scattered
+/// holds the results of how a `Material` scattered an incoming `Ray`.
+/// `attenuation` contains what `Color` was applied by the material to the incoming Ray
+/// `scattered` contains the new `Ray` that was scattered
 #[derive(Default, Debug, Copy, Clone)]
 pub struct ScatterRecord {
     pub attenuation: Color,
@@ -35,7 +35,7 @@ impl ScatterRecord {
 
 
 
-
+/// A trait for different material types that could be applied to a `Hittable`.
 pub trait Material: Send + Sync + Debug {
 
     /// Returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.

@@ -7,15 +7,32 @@ parser that allows you to render some scenes from the book at different widths, 
 ## Sample Scenes
 Here are some scenes from the book rendered at 1280x720 with samples per pixel set to 5000
 
+#### Final Scene from Book Two
+
 ![final book scene](images/final_scene.jpg)
+
+
+#### Cornell Box
 
 ![Cornell Box](images/cornell_box.jpg)
 
+
+#### Textured Earth Sphere
+
 ![earth sphere](images/earth_sphere.jpg)
+
+
+#### Cornell Box with smoke
 
 ![Cornell Smoke Boxes](images/smoke_boxes.jpg)
 
+
+#### Perlin Spheres
+
 ![Perlin Sphere](images/perlin_spheres.jpg)
+
+
+#### Random spheres
 
 ![Random Spheres](images/random_spheres.jpg)
 
@@ -38,15 +55,19 @@ to get command line help:
 
 #### Examples
 to generate the final scene from the second book with a width of 1280 pixels, and a 4:3 aspect ratio:
-> raytracer -w 1280 -a 1.33 -s 6
+> raytracer -w 1280 -a 1.33 -s 6                                                                                     
+
+to generate a quick preview of the same scene, set the samples per pixel to 1
+> raytracer -w 1280 -a 1.33 -s -p 1
 
 to generate the same scene with increased image quality (set samples per pixel to 5000)
 > raytracer -w 1280 -a 1.33 -p 5000 -s 6
 
-this greatly increase the render time. On a 4-core Intel 4770k running at 4.3GHz the total render time was
+higher samples per pixel values will increase the render time. On a 4-core Intel 4770k running at 4.3GHz 
+the total render time was 38 minutes.
   
 
-The following command line options are also supported and can be viewed by running `raytracer -h`:
+The following command line options are supported: `raytracer -h`:
 ```
 raytracer [-w WIDTH] [-p SAMPLES_PER_PIXEL] [-a ASPECT_RATIO] [-s SCENE_NUMBER]
 
