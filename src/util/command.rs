@@ -170,7 +170,7 @@ SCENE_NUMBER = integer between 1 - 6. let's you pick a scene to render. Defaults
                2 = Two Perlin Spheres
                3 = Texture mapped Earth
                4 = Cornell Box
-               5 = Cornell Box with smoky primitives
+               5 = Cornell Box with two smoke cubes
                6 = Final Scene (random boxes, spheres, lit by a single light)
 "#;
 
@@ -180,7 +180,7 @@ scene should be an integer between 1 and 6
 2 = Two Perlin Spheres
 3 = Texture mapped Earth
 4 = Cornell Box
-5 = Cornell Box with smoky primitives
+5 = Cornell Box with two smoke cubes
 6 = Final Scene (random boxes, spheres)
 "#;
 
