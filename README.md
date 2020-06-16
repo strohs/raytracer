@@ -1,28 +1,30 @@
 # Rust Raytracer
 A Rust implementation of the software ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
-In addition to the functionality from the book, this implementation adds multi-threaded rendering, and a 
-command line parser that allows you to render some scenes from the book.
+In addition to the functionality from the book, this implementation adds multi-threaded rendering, and a command line 
+parser that allows you to render some scenes from the book at different widths, aspect-ratios, and samples per pixel.
 
 ## Sample Scenes
-[Cornell Box](images/cornell_box.jpg)
+Here are some scenes from the book rendered at 1280x720 with samples per pixel set to 5000
 
-[earth sphere](images/earth_sphere.jpg)
+![Cornell Box](images/cornell_box.jpg)
 
-[Cornell Smoke Boxes](images/smoke_boxes.jpg)
+![earth sphere](images/earth_sphere.jpg)
 
-[Perlin Sphere](images/perlin_spheres.jpg)
+![Cornell Smoke Boxes](images/smoke_boxes.jpg)
 
-[Random Spheres](images/random_spheres.jpg)
+![Perlin Sphere](images/perlin_spheres.jpg)
 
-[final book scene](images/final_scene.jpg)
+![Random Spheres](images/random_spheres.jpg)
+
+![final book scene](images/final_scene.jpg)
 
 
 ### Building
-build the `raytracer` executable with `cargo build --release`
+use `cargo build --release` to build the raytracer executable
 
 ### Running
-run the raytracer executable from the command line without any options:
+run the raytracer from the command line without any options:
 > raytracer
 
 this will generate the default scene: Cornell Box, with default settings of: width=1024 pixels, 
@@ -34,13 +36,13 @@ to get command line help:
 
 
 #### Examples
-to generate the final scene from the book at a width of 1280 pixels, and a 4:3 aspect ratio:
+to generate the final scene from the second book with a width of 1280 pixels, and a 4:3 aspect ratio:
 > raytracer -w 1280 -a 1.33 -s 6
 
 to generate the same scene with increased image quality (set samples per pixel to 5000)
 > raytracer -w 1280 -a 1.33 -p 5000 -s 6
 
-this will increase the render time
+this greatly increase the render time. On a 4-core Intel 4770k running at 4.3GHz the total render time was
   
 
 The following command line options are also supported and can be viewed by running `raytracer -h`:
