@@ -165,12 +165,12 @@ ASPECT_RATIO = should be a floating point number >= 1.0. Defaults to 1.77  Some 
                1.33 = a 4:3 apect ratio
                1.43 = IMAX film format
                1.85 = U.S. widescreen cinema format
-SCENE_NUMBER = integer between 1 - 6. let's you pick a scene to render. Defaults to 6
+SCENE_NUMBER = scene number to render:
                1 = Random Spheres
                2 = Two Perlin Spheres
                3 = Texture mapped Earth
                4 = Cornell Box
-               5 = Cornell Box with smoky primitives
+               5 = Cornell Box with two smoke cubes
                6 = Final Scene (random boxes, spheres, lit by a single light)
 "#;
 
@@ -180,7 +180,7 @@ scene should be an integer between 1 and 6
 2 = Two Perlin Spheres
 3 = Texture mapped Earth
 4 = Cornell Box
-5 = Cornell Box with smoky primitives
+5 = Cornell Box with two smoke cubes
 6 = Final Scene (random boxes, spheres)
 "#;
 

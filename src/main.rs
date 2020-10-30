@@ -8,8 +8,8 @@ use raytracer::util::scenes::Scene;
 
 fn main() {
 
+    // parse the command line options
     let args: Vec<String> = env::args().collect();
-
     let command = Command::new(args).unwrap_or_else(|err| {
         eprintln!("{}", err);
         process::exit(1);
@@ -18,7 +18,7 @@ fn main() {
     // number of worker threads to use for rendering
     let pool_size = num_cpus::get_physical();
 
-    // build the camera, world and set what the background color should be for each scene
+    // build the camera, world and set the background color for each scene
     let (camera, world, renderer) = match command.scene {
         Scene::RandomSpheres => {
             let (c,w) = scenes::build_random_sphere_scene(command.width, command.aspect_ratio);

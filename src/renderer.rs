@@ -9,45 +9,19 @@ use crate::hittable::{Hittable, BvhNode, HittableList};
 use crate::common;
 
 
+/// Indicates what background color should be used by a renderer
+/// Currently only two options are supported:
+/// `Solid` - a solid color should be used for the background
+/// `LinearInterp(Color1, Color2)` - use linear interpolation to render the background color
+///  between color1 and color2
 #[derive(Debug, Copy, Clone)]
 pub enum BackgroundColor {
     Solid(Color),
     LinearInterp(Color, Color),
 }
 
-// #[derive(Debug)]
-// pub struct RenderJob {
-//     pub world: BvhNode,
-//     pub camera: Camera,
-//     pub background_color: BackgroundColor,
-//     pub ray_bounce_depth: u32,
-//     pub samples_per_pixel: u32,
-// }
-//
-// impl RenderJob {
-//
-//     pub fn from(
-//         mut hittables: HittableList,
-//         camera: Camera,
-//         background_color: BackgroundColor,
-//         ray_bounce_depth: u32,
-//         samples_per_pixel: u32) -> Self
-//     {
-//         // convert hittable list into a BVH
-//         let world = BvhNode::from(&mut hittables, 0.0, 1.0);
-//
-//         Self {
-//             world,
-//             camera,
-//             background_color,
-//             ray_bounce_depth,
-//             samples_per_pixel,
-//         }
-//     }
-// }
 
-/// Renderer is a multi-threaded raytracer.
-/// Call this structs `render()` method and pass in a `Camera` and a list of `Hittables`.
+/// A Renderer will use ray-tracing to render a scene using a Camera and a list of Hittables.
 ///
 /// `ray_bounce_depth` limits the level of recursion performed when computing a ray's color.
 /// 50 is a good default value
@@ -57,8 +31,8 @@ pub enum BackgroundColor {
 /// images
 /// `background_color` sets the default color of the renderer. This color is used as the
 /// default ray color when a ray does not hit something
-/// `num_workers` is the number of **OS threads** to spawn for rendering. Ideally this should be
-/// equal to the number of physical cores on your machine
+/// `num_workers` is the number of **Operating System threads** to spawn for rendering. Ideally
+/// this should be equal to the number of physical cores on your machine
 ///
 #[derive(Debug, Copy, Clone)]
 pub struct Renderer {
@@ -85,8 +59,13 @@ impl Renderer {
         }
     }
 
+    /// Returns this renderer's bounce depth setting
     pub fn ray_bounce_depth(&self) -> u32 { self.ray_bounce_depth }
+
+    /// Returns this renderer's samples per pixel setting
     pub fn samples_per_pixel(&self) -> u32 { self.samples_per_pixel }
+
+    /// Returns this renderer's background color setting
     pub fn background_color(&self) -> BackgroundColor { self.background_color }
 
 

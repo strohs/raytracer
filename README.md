@@ -1,22 +1,73 @@
 # Rust Raytracer
-A Rust implementation of the ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
+A Rust implementation of the software ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
-In addition to the functionality from the book, this implementation adds multi-threading to the ray-tracer and a 
-simple command line parser that will allow you to specify the image width, aspect-ratio, samples per pixel, and a 
-pre-made scene number to render.
+In addition to the functionality from the book, this implementation adds multi-threaded rendering, and a command line 
+parser that allows you to render some scenes from the book at different widths, aspect-ratios, and samples per pixel.
 
 ## Sample Scenes
+Here are some scenes from the book rendered at 1280x720 with samples per pixel set to 5000
+
+#### Final Scene from Book Two
+
+![final book scene](images/final_scene.jpg)
+
+
+#### Cornell Box
+
+![Cornell Box](images/cornell_box.jpg)
+
+
+#### Textured Earth Sphere
+
+![earth sphere](images/earth_sphere.jpg)
+
+
+#### Cornell Box with smoke
+
+![Cornell Smoke Boxes](images/smoke_boxes.jpg)
+
+
+#### Perlin Spheres
+
+![Perlin Sphere](images/perlin_spheres.jpg)
+
+
+#### Random spheres
+
+![Random Spheres](images/random_spheres.jpg)
+
 
 ### Building
-build the `raytracer` executable with `cargo build --release`
+use `cargo build --release` to build the raytracer executable
 
 ### Running
-from the command line run
+run the raytracer from the command line without any options:
 > raytracer
 
-this will generate a Cornell Box scene with a width of 1024 pixels, a 16:9 aspect ratio, and 500 samples per pixel 
+this will generate the default scene: Cornell Box, with default settings of: width=1024 pixels, 
+aspect ratio=1.77 (16:9), and samples per pixel = 500
+The final image will be saved in the same directory that you invoked the raytracer from as a **.ppm** image
 
-The following command line options are also supported:
+
+to get command line help:
+> raytracer -h
+
+
+#### Examples
+to generate the final scene from the second book with a width of 1280 pixels, and a 4:3 aspect ratio:
+> raytracer -w 1280 -a 1.33 -s 6                                                                                     
+
+to generate a quick preview of the same scene, set the samples per pixel to 1
+> raytracer -w 1280 -a 1.33 -s -p 1
+
+to generate the same scene with increased image quality (set samples per pixel to 5000)
+> raytracer -w 1280 -a 1.33 -p 5000 -s 6
+
+higher samples per pixel values will increase the render time. On a 4-core Intel 4770k running at 4.3GHz 
+the total render time was 38 minutes.
+  
+
+The following command line options are supported: `raytracer -h`:
 ```
 raytracer [-w WIDTH] [-p SAMPLES_PER_PIXEL] [-a ASPECT_RATIO] [-s SCENE_NUMBER]
 
