@@ -81,7 +81,6 @@ fn main() {
     println!("rendering scene: {:?}", &command.scene);
 
     let image = renderer.render(camera, world);
-    
     // write the image data to a PPM file
     match ppm::write_file(&file_path, width, height, &image) {
         Ok(()) => println!("test image created at {:?}", file_path),
@@ -89,5 +88,3 @@ fn main() {
     }
 
 }
-
-

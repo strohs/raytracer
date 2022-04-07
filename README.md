@@ -1,11 +1,15 @@
 # Rust Raytracer
 A Rust implementation of the software ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
-In addition to the functionality from the book, this implementation adds multi-threaded rendering, and a command line 
-parser that allows you to render some scenes from the book at different widths, aspect-ratios, and samples per pixel.
+This implementation of the raytracer adds multi-threaded rendering, plus the ability to render one of the six sample scenes described in the book.
+
+The final rendered images are saved in the [ppm](http://ailab.eecs.wsu.edu/wise/P1/PPM.html) image format, so you will need
+an image viewer that can display them.
 
 ## Sample Scenes
-Here are some scenes from the book rendered at 1280x720 with samples per pixel set to 5000
+Here are the sample scenes from the book that can be generated using this raytracer.
+
+They are rendered at 1280x720 with samples per pixel set to 5000.
 
 #### Final Scene from Book Two
 
@@ -41,7 +45,7 @@ Here are some scenes from the book rendered at 1280x720 with samples per pixel s
 use `cargo build --release` to build the raytracer executable
 
 ### Running
-run the raytracer from the command line without any options:
+run the raytracer executable from the command line without any options:
 > raytracer
 
 this will generate the default scene: Cornell Box, with default settings of: width=1024 pixels, 
