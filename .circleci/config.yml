@@ -1,10 +1,24 @@
 version: 2.1
 
 jobs:
-  test_and_build:
+  build:
+    docker:
+      - image: cimg/rust:1.60.0
+    steps:
+      - checkout
+      - run: cargo build --release
+
+  test:
     docker:
       - image: cimg/rust:1.60.0
     steps:
       - checkout
       - run: cargo test
-      - run: cargo build --release
+
+workflows:
+  test:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
