@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/strohs/raytracer.svg?style=shield)](https://circleci.com/gh/strohs/raytracer)
 
 # Rust Raytracer
-A Rust implementation of the software ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
+A Rust implementation of the software ray-tracer from the first two books of [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
 This implementation of the raytracer adds multi-threaded rendering, plus the ability to render one of the six sample scenes described in the book.
 
@@ -44,10 +44,10 @@ They are rendered at 1280x720 with samples per pixel set to 5000.
 ![Random Spheres](images/random_spheres.jpg)
 
 
-### Building
+## Building
 use `cargo build --release` to build the raytracer executable
 
-### Running
+## Running
 run the raytracer executable from the command line without any options:
 > raytracer
 
@@ -60,7 +60,7 @@ to get command line help:
 > raytracer -h
 
 
-#### Examples
+### Examples
 to generate the final scene from the second book with a width of 1280 pixels, and a 4:3 aspect ratio:
 > raytracer -w 1280 -a 1.33 -s 6                                                                                     
 
