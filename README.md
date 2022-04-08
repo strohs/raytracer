@@ -1,10 +1,13 @@
+[![CircleCI](https://circleci.com/gh/strohs/raytracer.svg?style=shield)](https://circleci.com/gh/strohs/raytracer)
+
 # Rust Raytracer
 A Rust implementation of the software ray-tracer from the first two books of the [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
 This implementation of the raytracer adds multi-threaded rendering, plus the ability to render one of the six sample scenes described in the book.
 
-The final rendered images are saved in the [ppm](http://ailab.eecs.wsu.edu/wise/P1/PPM.html) image format, so you will need
-an image viewer that can display them.
+The final rendered images are saved in the [ppm](http://ailab.eecs.wsu.edu/wise/P1/PPM.html) image format. Most modern image viewing programs 
+should be able to display .ppm image files. 
+On my linux system I used [feh](https://feh.finalrewind.org/)
 
 ## Sample Scenes
 Here are the sample scenes from the book that can be generated using this raytracer.
