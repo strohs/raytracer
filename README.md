@@ -74,7 +74,7 @@ higher samples per pixel values will increase the render time. On a 4-core Intel
 the total render time was 38 minutes.
   
 
-The following command line options are supported: `raytracer -h`:
+The following command line options are supported:
 ```
 raytracer [-w WIDTH] [-p SAMPLES_PER_PIXEL] [-a ASPECT_RATIO] [-s SCENE_NUMBER]
 
