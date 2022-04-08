@@ -1,6 +1,6 @@
-use std::sync::Arc;
-use crate::common::{Point3, Vec3, Ray};
+use crate::common::{Point3, Ray, Vec3};
 use crate::material::Material;
+use std::sync::Arc;
 
 /// holds a 'record' containing the details of where a Ray "hit" a "hittable" object
 pub struct HitRecord {
@@ -28,16 +28,16 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-
     /// create a new `HitRecord`
-    pub fn new(p: Point3,
-               normal: Vec3,
-               mat_ptr: Arc<dyn Material>,
-               t: f64,
-               u: f64,
-               v: f64,
-               front_face: bool) -> Self
-    {
+    pub fn new(
+        p: Point3,
+        normal: Vec3,
+        mat_ptr: Arc<dyn Material>,
+        t: f64,
+        u: f64,
+        v: f64,
+        front_face: bool,
+    ) -> Self {
         Self {
             p,
             normal,
@@ -56,14 +56,15 @@ impl HitRecord {
     /// `outward_normal` - the outward normal of the given point `p`
     /// `mat_ptr` - pointer the type of material that was hit
     /// `t` - the position along `r` that hit `p`
-    pub fn with_face_normal(ray: &Ray,
-                            point: Point3,
-                            outward_normal: &Vec3,
-                            mat_ptr: Arc<dyn Material>,
-                            t: f64,
-                            u: f64,
-                            v: f64,) -> Self
-    {
+    pub fn with_face_normal(
+        ray: &Ray,
+        point: Point3,
+        outward_normal: &Vec3,
+        mat_ptr: Arc<dyn Material>,
+        t: f64,
+        u: f64,
+        v: f64,
+    ) -> Self {
         let front_face = HitRecord::hit_front_face(ray, outward_normal);
         let normal = if front_face {
             *outward_normal
@@ -89,5 +90,4 @@ impl HitRecord {
             -*outward_normal
         }
     }
-
 }

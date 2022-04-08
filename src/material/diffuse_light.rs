@@ -1,8 +1,8 @@
-use std::sync::Arc;
-use crate::texture::Texture;
-use crate::material::{Material, ScatterRecord};
-use crate::common::{Ray, Point3, Color};
+use crate::common::{Color, Point3, Ray};
 use crate::hittable::HitRecord;
+use crate::material::{Material, ScatterRecord};
+use crate::texture::Texture;
+use std::sync::Arc;
 
 /// Models a diffuse light source that can emit light of a specific `Color`
 #[derive(Debug)]
@@ -11,16 +11,12 @@ pub struct DiffuseLight {
 }
 
 impl DiffuseLight {
-
     pub fn from(tex_ptr: Arc<dyn Texture>) -> Self {
-        Self {
-            emit: tex_ptr,
-        }
+        Self { emit: tex_ptr }
     }
 }
 
 impl Material for DiffuseLight {
-
     /// this default implementation of diffuse light does not scatter.
     fn scatter(&self, _r_in: &Ray, _rec: &HitRecord) -> Option<ScatterRecord> {
         None

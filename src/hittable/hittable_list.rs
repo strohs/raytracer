@@ -7,16 +7,9 @@ use crate::hittable::Aabb;
 use std::fmt::Formatter;
 
 /// a list of all Hittable objects in the ray tracer's "world" (a.k.a scene)
+#[derive(Default)]
 pub struct HittableList {
-    objects: Vec<Arc<dyn Hittable>>
-}
-
-impl Default for HittableList {
-    fn default() -> Self {
-        Self {
-            objects: vec![]
-        }
-    }
+    objects: Vec<Arc<dyn Hittable>>,
 }
 
 impl HittableList {
@@ -36,14 +29,12 @@ impl HittableList {
         self.objects.push(object);
     }
 
-
     pub fn objects(&mut self) -> &mut Vec<Arc<dyn Hittable>> {
         &mut self.objects
     }
 }
 
 impl Hittable for HittableList {
-
     /// iterate through this hittable list to determine if a `Ray` has hit some
     /// object in the world. If an object was hit, `Some(HitRecord)` is returned
     /// containing details of the **closest hit**. If no object was hit by the ray,
@@ -70,7 +61,8 @@ impl Hittable for HittableList {
 
         // this will compute a surrounding bounding box for all Hittables that return an AABB,
         // AABB's that return None are filtered out
-        let output_box = self.objects
+        let output_box = self
+            .objects
             .iter()
             .map(|hittable| hittable.bounding_box(t0, t1))
             .filter(|aabb| aabb.is_some())
@@ -109,11 +101,11 @@ impl std::fmt::Debug for HittableList {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
+    use crate::common::Point3;
+    use crate::hittable::{Hittable, HittableList, Sphere};
     use crate::material::{Lambertian, Material};
-    use crate::common::{Point3};
-    use crate::hittable::{Sphere, HittableList, Hittable};
     use crate::texture::{SolidColor, Texture};
+    use std::sync::Arc;
 
     #[test]
     fn should_return_a_surrounding_bounding_box_with_min0_max3() {

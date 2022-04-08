@@ -1,7 +1,7 @@
-use std::sync::Arc;
+use crate::common::{Point3, Ray, Vec3};
+use crate::hittable::{Aabb, HitRecord, Hittable};
 use crate::material::Material;
-use crate::hittable::{Hittable, HitRecord, Aabb};
-use crate::common::{Ray, Point3, Vec3};
+use std::sync::Arc;
 
 /// a 2D, `Hittable` rectangle, that's aligned on the **xy plane**
 #[derive(Debug)]
@@ -11,24 +11,24 @@ pub struct XYRect {
     x1: f64,
     y0: f64,
     y1: f64,
-    k: f64
+    k: f64,
 }
 
 impl XYRect {
-
     /// Returns an axis-aligned rectangle from the given coordinates and material
-    pub fn from(x0: f64, x1: f64, y0: f64, y1: f64, k:f64, mp: Arc<dyn Material>) -> Self {
+    pub fn from(x0: f64, x1: f64, y0: f64, y1: f64, k: f64, mp: Arc<dyn Material>) -> Self {
         Self {
-            x0, x1,
-            y0, y1,
+            x0,
+            x1,
+            y0,
+            y1,
             k,
-            mp
+            mp,
         }
     }
 }
 
 impl Hittable for XYRect {
-
     /// Returns `Some(HitRecord)` if the given Ray `r` intersects this Rectangle, else `None`.
     /// `t0,t1` are the time intervals of the ray
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -44,15 +44,15 @@ impl Hittable for XYRect {
             return None;
         }
 
-        Some(
-            HitRecord::with_face_normal(
-                r,
-                r.at(t),
-                &Vec3::new(0.0, 0.0, 1.0),
-                Arc::clone(&self.mp),
-                t,
-                (x - self.x0) / (self.x1 - self.x0),
-                (y - self.y0) / (self.y1 - self.y0)))
+        Some(HitRecord::with_face_normal(
+            r,
+            r.at(t),
+            &Vec3::new(0.0, 0.0, 1.0),
+            Arc::clone(&self.mp),
+            t,
+            (x - self.x0) / (self.x1 - self.x0),
+            (y - self.y0) / (self.y1 - self.y0),
+        ))
     }
 
     /// Returns a axis-aligned bounding box for this rectangle
@@ -61,13 +61,11 @@ impl Hittable for XYRect {
         // dimension a small amount.
         let bbox = Aabb::new(
             Point3::new(self.x0, self.y0, self.k - 0.001),
-            Point3::new(self.x1, self.y1, self.k + 0.001));
+            Point3::new(self.x1, self.y1, self.k + 0.001),
+        );
         Some(bbox)
     }
 }
-
-
-
 
 /// a 2D, `Hittable` rectangle, that's aligned on the **xz plane**
 #[derive(Debug)]
@@ -77,24 +75,24 @@ pub struct XZRect {
     x1: f64,
     z0: f64,
     z1: f64,
-    k: f64
+    k: f64,
 }
 
 impl XZRect {
-
     /// Returns an axis-aligned rectangle from the given coordinates and material
-    pub fn from(x0: f64, x1: f64, z0: f64, z1: f64, k:f64, mp: Arc<dyn Material>) -> Self {
+    pub fn from(x0: f64, x1: f64, z0: f64, z1: f64, k: f64, mp: Arc<dyn Material>) -> Self {
         Self {
-            x0, x1,
-            z0, z1,
+            x0,
+            x1,
+            z0,
+            z1,
             k,
-            mp
+            mp,
         }
     }
 }
 
 impl Hittable for XZRect {
-
     /// Returns `Some(HitRecord)` if the given Ray `r` intersects this Rectangle, else `None`.
     /// `t0,t1` are the time intervals of the ray
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -110,15 +108,15 @@ impl Hittable for XZRect {
             return None;
         }
 
-        Some(
-            HitRecord::with_face_normal(
-                r,
-                r.at(t),
-                &Vec3::new(0.0, 1.0, 0.0),
-                Arc::clone(&self.mp),
-                t,
-                (x - self.x0) / (self.x1 - self.x0),
-                (z - self.z0) / (self.z1 - self.z0)))
+        Some(HitRecord::with_face_normal(
+            r,
+            r.at(t),
+            &Vec3::new(0.0, 1.0, 0.0),
+            Arc::clone(&self.mp),
+            t,
+            (x - self.x0) / (self.x1 - self.x0),
+            (z - self.z0) / (self.z1 - self.z0),
+        ))
     }
 
     /// Returns a axis-aligned bounding box for this rectangle
@@ -126,14 +124,12 @@ impl Hittable for XZRect {
         // The bounding box will have non-zero width in each dimension, so pad the Y
         // dimension a small amount.
         let bbox = Aabb::new(
-            Point3::new(self.x0, self.k - 0.001,self.z0),
-            Point3::new(self.x1, self.k + 0.001,self.z1));
+            Point3::new(self.x0, self.k - 0.001, self.z0),
+            Point3::new(self.x1, self.k + 0.001, self.z1),
+        );
         Some(bbox)
     }
 }
-
-
-
 
 /// a 2D, `Hittable` rectangle, that's aligned on the **yz plane**
 #[derive(Debug)]
@@ -143,24 +139,24 @@ pub struct YZRect {
     y1: f64,
     z0: f64,
     z1: f64,
-    k: f64
+    k: f64,
 }
 
 impl YZRect {
-
     /// Returns an axis-aligned rectangle from the given coordinates and material
-    pub fn from(y0: f64, y1: f64, z0: f64, z1: f64, k:f64, mp: Arc<dyn Material>) -> Self {
+    pub fn from(y0: f64, y1: f64, z0: f64, z1: f64, k: f64, mp: Arc<dyn Material>) -> Self {
         Self {
-            y0, y1,
-            z0, z1,
+            y0,
+            y1,
+            z0,
+            z1,
             k,
-            mp
+            mp,
         }
     }
 }
 
 impl Hittable for YZRect {
-
     /// Returns `Some(HitRecord)` if the given Ray `r` intersects this Rectangle, else `None`.
     /// `t0,t1` are the time intervals of the ray
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
@@ -176,15 +172,15 @@ impl Hittable for YZRect {
             return None;
         }
 
-        Some(
-            HitRecord::with_face_normal(
-                r,
-                r.at(t),
-                &Vec3::new(1.0, 0.0, 0.0),
-                Arc::clone(&self.mp),
-                t,
-                (y - self.y0) / (self.y1 - self.y0),
-                (z - self.z0) / (self.z1 - self.z0)))
+        Some(HitRecord::with_face_normal(
+            r,
+            r.at(t),
+            &Vec3::new(1.0, 0.0, 0.0),
+            Arc::clone(&self.mp),
+            t,
+            (y - self.y0) / (self.y1 - self.y0),
+            (z - self.z0) / (self.z1 - self.z0),
+        ))
     }
 
     /// Returns a axis-aligned bounding box for this rectangle
@@ -193,7 +189,8 @@ impl Hittable for YZRect {
         // dimension a small amount.
         let bbox = Aabb::new(
             Point3::new(self.k - 0.001, self.y0, self.z0),
-            Point3::new(self.k + 0.001, self.y1, self.z1));
+            Point3::new(self.k + 0.001, self.y1, self.z1),
+        );
         Some(bbox)
     }
 }

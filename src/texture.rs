@@ -16,7 +16,6 @@ pub use noise_texture::*;
 use crate::common::{Color, Point3, Vec3};
 use std::f64::consts::PI;
 
-
 /// Computes the `u,v` surface coordinates for a sphere given its center point.
 /// `p` is the center point of a unit sphere centered at the origin.
 ///  Returns a tuple `(u,v)`, containing the sphere's u,v coordinates
@@ -28,13 +27,11 @@ pub fn get_sphere_uv(p: &Vec3) -> (f64, f64) {
     (u, v)
 }
 
-
 /// A trait for Hittables that have a texture. A texture in graphics is usually a function that makes
 /// the colors on a surface procedural. This procedure can be synthesis code, or it could be an
 /// image lookup, or a combination of both.
 ///
 pub trait Texture: Send + Sync + std::fmt::Debug {
-
     /// Returns the color of a texture at the given `u,v` coordinate and point `p`
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color;
 }

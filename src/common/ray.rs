@@ -1,4 +1,4 @@
-use crate::common::{Vec3, Point3};
+use crate::common::{Point3, Vec3};
 
 /// a three dimensional Ray consisting of an origin point, a direction `dir` ['Vec3'] and
 /// a moment in `time` that the ray existed
@@ -10,14 +10,9 @@ pub struct Ray {
 }
 
 impl Ray {
-
     /// construct a new Ray with the given `origin`, `direction`, and `time`
     pub fn new(orig: Point3, dir: Vec3, time: f64) -> Self {
-        Self {
-            orig,
-            dir,
-            time,
-        }
+        Self { orig, dir, time }
     }
 
     /// returns a copy of this Ray's origin field
@@ -40,7 +35,6 @@ impl Ray {
     pub fn at(&self, t: f64) -> Point3 {
         self.orig + t * self.dir
     }
-
 }
 
 #[cfg(test)]
@@ -57,32 +51,20 @@ mod tests {
 
     #[test]
     fn ray_origin() {
-        let ray = Ray::new(
-            Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0),
-            1.0
-        );
+        let ray = Ray::new(Point3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0), 1.0);
         assert_eq!(ray.origin(), Point3::new(1.0, 2.0, 3.0));
     }
 
     #[test]
     fn ray_direction() {
-        let ray = Ray::new(
-            Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0),
-            1.0
-        );
+        let ray = Ray::new(Point3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0), 1.0);
         assert_eq!(ray.direction(), Vec3::new(4.0, 5.0, 6.0));
     }
 
     #[test]
     fn ray_at() {
         let t = 2.0;
-        let ray = Ray::new(
-            Point3::new(1.0, 2.0, 3.0),
-            Vec3::new(4.0, 5.0, 6.0),
-            1.0
-        );
+        let ray = Ray::new(Point3::new(1.0, 2.0, 3.0), Vec3::new(4.0, 5.0, 6.0), 1.0);
         let point_at = ray.at(t);
         assert_eq!(point_at, Point3::new(9.0, 12.0, 15.0));
     }

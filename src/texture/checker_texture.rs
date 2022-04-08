@@ -1,6 +1,6 @@
+use crate::common::{Color, Point3};
 use crate::texture::Texture;
 use std::sync::Arc;
-use crate::common::{Point3, Color};
 
 /// Checker will generate a "checker board" texture.
 /// The checker `odd`/`even` references can be to a constant texture or to some other
@@ -16,29 +16,22 @@ pub struct CheckerTexture {
 }
 
 impl CheckerTexture {
-
     /// Returns a "Checker" texture from an `odd` and `even` Texture that are used to generate
     /// the checkerboard pattern
     pub fn from(even: Arc<dyn Texture>, odd: Arc<dyn Texture>) -> Self {
-        Self {
-            even,
-            odd,
-        }
+        Self { even, odd }
     }
 }
 
 impl Texture for CheckerTexture {
-
     /// Returns the checkerboard `Color` at the given `u, v` coordinate and point `p`
     fn value(&self, u: f64, v: f64, p: &Point3) -> Color {
-        let sines = f64::sin(10.0 * p.x())
-            * f64::sin(10.0 * p.y())
-            * f64::sin(10.0 * p.z());
+        let sines = f64::sin(10.0 * p.x()) * f64::sin(10.0 * p.y()) * f64::sin(10.0 * p.z());
 
         if sines < 0.0 {
-            self.odd.value(u,v,p)
+            self.odd.value(u, v, p)
         } else {
-            self.even.value(u,v,p)
+            self.even.value(u, v, p)
         }
     }
 }

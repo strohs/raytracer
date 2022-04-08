@@ -1,9 +1,9 @@
-use std::sync::Arc;
-use rand::Rng;
-use crate::hittable::{Hittable, HitRecord, Aabb};
-use crate::material::{Material, Isotropic};
-use crate::texture::Texture;
 use crate::common::{Ray, Vec3};
+use crate::hittable::{Aabb, HitRecord, Hittable};
+use crate::material::{Isotropic, Material};
+use crate::texture::Texture;
+use rand::Rng;
+use std::sync::Arc;
 
 /// ConstantMedium models a volume of constant density, like smoke, fog, or mist.
 /// A `Ray` that hits it can either scatter inside the volume or go all the way through it.
@@ -23,7 +23,6 @@ pub struct ConstantMedium {
 }
 
 impl ConstantMedium {
-
     /// Returns a new `ConstantMedium` from the given boundary `b`, density `d`, and
     /// texture `a`
     pub fn from(b: Arc<dyn Hittable>, d: f64, a: Arc<dyn Texture>) -> Self {
@@ -38,11 +37,7 @@ impl ConstantMedium {
     }
 }
 
-
-
-
 impl Hittable for ConstantMedium {
-
     /// Returns `Some(HitRecord)` if the ray `r` hits this constant medium. This hit function
     /// assumes the boundary shape is **convex**. It will not work for shapes like toruses or
     /// shapes that contain voids.
@@ -55,17 +50,25 @@ impl Hittable for ConstantMedium {
 
         let mut rec2 = self.boundary.hit(r, rec1.t + 0.00001, f64::INFINITY)?;
 
-        if debugging { println!("nt0={:?} t1={:?}", &rec1.t, &rec2.t) }
+        if debugging {
+            println!("nt0={:?} t1={:?}", &rec1.t, &rec2.t)
+        }
 
         // need to make sure hit detection works for ray origins inside the volume
-        if rec1.t < t_min { rec1.t = t_min; }
-        if rec2.t > t_max { rec2.t = t_max; }
+        if rec1.t < t_min {
+            rec1.t = t_min;
+        }
+        if rec2.t > t_max {
+            rec2.t = t_max;
+        }
 
         if rec1.t >= rec2.t {
             return None;
         }
 
-        if rec1.t < 0.0 { rec1.t = 0.0; }
+        if rec1.t < 0.0 {
+            rec1.t = 0.0;
+        }
 
         let ray_length = r.direction().length();
         let distance_inside_boudary = (rec2.t - rec1.t) * ray_length;
@@ -79,10 +82,11 @@ impl Hittable for ConstantMedium {
             let normal = Vec3::new(1.0, 0.0, 0.0);
             let mat_ptr = Arc::clone(&self.phase_function);
             let hit_rec = HitRecord::new(p, normal, mat_ptr, t, rec1.u, rec1.v, true);
-            if debugging { println!("{:?} {:?} {:?}", hit_distance, t, p); }
+            if debugging {
+                println!("{:?} {:?} {:?}", hit_distance, t, p);
+            }
             Some(hit_rec)
         }
-
     }
 
     /// Returns the bounding box of this volume's `boundary`

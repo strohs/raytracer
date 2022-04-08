@@ -1,5 +1,5 @@
-use crate::common::{Point3, Vec3, Camera};
 use crate::common;
+use crate::common::{Camera, Point3, Vec3};
 
 /// A builder struct for constructing a `Camera`.
 /// Supply all the fields and the call the `build()` function to return a new Camera
@@ -18,11 +18,9 @@ pub struct CameraBuilder {
 }
 
 impl CameraBuilder {
-
     pub fn new() -> Self {
         CameraBuilder::default()
     }
-
 
     ///////////////////////////////////////////////////////////
     //              Builder Functions BEGIN HERE
@@ -95,15 +93,12 @@ impl CameraBuilder {
         let u = self.vup.cross(w).unit_vector();
         let v = w.cross(u);
 
-        let (vp_width, vp_height) = CameraBuilder::viewport_width_height(
-            self.vfov,
-            self.aspect_ratio);
+        let (vp_width, vp_height) =
+            CameraBuilder::viewport_width_height(self.vfov, self.aspect_ratio);
         let horizontal = self.focus_dist * vp_width * u;
         let vertical = self.focus_dist * vp_height * v;
-        let lower_left_corner = self.look_from
-            - horizontal / 2.0
-            - vertical / 2.0
-            - self.focus_dist * w;
+        let lower_left_corner =
+            self.look_from - horizontal / 2.0 - vertical / 2.0 - self.focus_dist * w;
         let lens_radius = self.aperture / 2.0;
 
         Camera {

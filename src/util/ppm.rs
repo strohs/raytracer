@@ -1,8 +1,8 @@
+use crate::common::Color;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::io::LineWriter;
-use crate::common::{Color};
 
 pub const MAX_RGB_COLOR: u8 = 255;
 
@@ -21,7 +21,13 @@ pub fn write_file(file_path: &str, width: u32, height: u32, image: &[Color]) -> 
             let idx = ((height - 1 - r) * width + c) as usize;
             let color = image[idx];
             writer.write_all(
-                format!("{} {} {}\n", color.x() as u8, color.y() as u8, color.z() as u8).as_bytes()
+                format!(
+                    "{} {} {}\n",
+                    color.x() as u8,
+                    color.y() as u8,
+                    color.z() as u8
+                )
+                .as_bytes(),
             )?;
         }
     }

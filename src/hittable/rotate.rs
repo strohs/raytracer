@@ -1,6 +1,6 @@
-use crate::hittable::{Hittable, Aabb, HitRecord};
+use crate::common::{degrees_to_radians, Point3, Ray, Vec3};
+use crate::hittable::{Aabb, HitRecord, Hittable};
 use std::sync::Arc;
-use crate::common::{degrees_to_radians, Point3, Vec3, Ray};
 
 #[derive(Debug)]
 pub struct RotateY {
@@ -12,7 +12,8 @@ pub struct RotateY {
 
 impl RotateY {
     pub fn from(p: Arc<dyn Hittable>, angle: f64) -> Self {
-        let bbox = p.bounding_box(0.0, 1.0)
+        let bbox = p
+            .bounding_box(0.0, 1.0)
             .expect("can't rotate-y a Hittable that doesn't have a bounding box");
 
         let sin_theta = degrees_to_radians(angle).sin();
@@ -51,7 +52,6 @@ impl RotateY {
 }
 
 impl Hittable for RotateY {
-
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut origin = r.origin();
         let mut direction = r.direction();
@@ -63,7 +63,7 @@ impl Hittable for RotateY {
         direction[2] = self.sin_theta * r.direction()[0] + self.cos_theta * r.direction()[2];
 
         let rotated_r = Ray::new(origin, direction, r.time());
-        
+
         if let Some(mut rec) = self.ptr.hit(&rotated_r, t_min, t_max) {
             let mut p = rec.p;
             let mut normal = rec.normal;
@@ -89,8 +89,8 @@ impl Hittable for RotateY {
 
 #[cfg(test)]
 mod tests {
+    use crate::common::{Color, Point3};
     use crate::hittable::{BoxInst, RotateY};
-    use crate::common::{Point3, Color};
     use crate::material::Metal;
     use std::sync::Arc;
 
@@ -99,7 +99,8 @@ mod tests {
         let box_inst = BoxInst::from(
             Point3::new(0.0, 0.0, 0.0),
             Point3::new(1., 1., 1.),
-            Arc::new(Metal::new(Color::new(0., 0., 0.), 0.5)));
+            Arc::new(Metal::new(Color::new(0., 0., 0.), 0.5)),
+        );
         let roty = RotateY::from(Arc::new(box_inst), 90.0);
         dbg!(roty);
     }

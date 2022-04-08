@@ -1,13 +1,12 @@
+use rand::Rng;
+use std::sync::mpsc::{channel, Sender};
 use std::sync::Arc;
-use std::sync::mpsc::{Sender, channel};
 use std::time::Instant;
 use threadpool::ThreadPool;
-use rand::{Rng};
 
-use crate::common::{Ray, Color, Camera};
-use crate::hittable::{Hittable, BvhNode, HittableList};
 use crate::common;
-
+use crate::common::{Camera, Color, Ray};
+use crate::hittable::{BvhNode, Hittable, HittableList};
 
 /// Indicates what background color should be used by a renderer
 /// Currently only two options are supported:
@@ -19,7 +18,6 @@ pub enum BackgroundColor {
     Solid(Color),
     LinearInterp(Color, Color),
 }
-
 
 /// A Renderer will use ray-tracing to render a scene using a Camera and a list of Hittables.
 ///
@@ -43,31 +41,35 @@ pub struct Renderer {
 }
 
 impl Renderer {
-
     /// Returns a new renderer.
     pub fn new(
         ray_bounce_depth: u32,
         samples_per_pixel: u32,
         background_color: BackgroundColor,
-        num_workers: usize) -> Self
-    {
+        num_workers: usize,
+    ) -> Self {
         Self {
             ray_bounce_depth,
             samples_per_pixel,
             background_color,
-            num_workers
+            num_workers,
         }
     }
 
     /// Returns this renderer's bounce depth setting
-    pub fn ray_bounce_depth(&self) -> u32 { self.ray_bounce_depth }
+    pub fn ray_bounce_depth(&self) -> u32 {
+        self.ray_bounce_depth
+    }
 
     /// Returns this renderer's samples per pixel setting
-    pub fn samples_per_pixel(&self) -> u32 { self.samples_per_pixel }
+    pub fn samples_per_pixel(&self) -> u32 {
+        self.samples_per_pixel
+    }
 
     /// Returns this renderer's background color setting
-    pub fn background_color(&self) -> BackgroundColor { self.background_color }
-
+    pub fn background_color(&self) -> BackgroundColor {
+        self.background_color
+    }
 
     /// Renders an image using the provided `Camera` and `World`.
     ///
@@ -75,11 +77,16 @@ impl Renderer {
     /// a Vector of `Color`s representing the final color of each pixel in the image.
     /// The colors of the image are stored in row major format, starting from top left
     /// to the bottom right
-    pub fn render(self, camera: Camera, mut world: HittableList) -> Vec<Color>
-    {
+    pub fn render(self, camera: Camera, mut world: HittableList) -> Vec<Color> {
         let now = Instant::now();
-        println!("rendering a {}x{} image. threads={}  bounce_depth={}  samples_per_pixel={}",
-                 &camera.image_width, &camera.image_height, &self.num_workers, &self.ray_bounce_depth, &self.samples_per_pixel);
+        println!(
+            "rendering a {}x{} image. threads={}  bounce_depth={}  samples_per_pixel={}",
+            &camera.image_width,
+            &camera.image_height,
+            &self.num_workers,
+            &self.ray_bounce_depth,
+            &self.samples_per_pixel
+        );
 
         // build a thread pool to render a pixel color per thread
         let pool = ThreadPool::new(self.num_workers);
@@ -99,21 +106,21 @@ impl Renderer {
                 let camera = Arc::clone(&camera);
 
                 pool.execute(move || {
-                    let row_colors = self.render_scanline(
-                        row,
-                        &*world,
-                        &camera);
-                    tx.send((row, row_colors)).expect("error occurred rendering");
+                    let row_colors = self.render_scanline(row, &*world, &camera);
+                    tx.send((row, row_colors))
+                        .expect("error occurred rendering");
                 });
             }
-            println!("submitted {} scanline render jobs with a thread pool size = {}",
-                     &camera.image_height,
-                     &self.num_workers);
+            println!(
+                "submitted {} scanline render jobs with a thread pool size = {}",
+                &camera.image_height, &self.num_workers
+            );
             rx
         };
 
         // allocate a vector to store the pixel colors of the image (in row major format)
-        let mut image: Vec<Color> = vec![Color::default(); (camera.image_width * camera.image_height) as usize];
+        let mut image: Vec<Color> =
+            vec![Color::default(); (camera.image_width * camera.image_height) as usize];
 
         // read finished jobs data from the channel and store in image vector
         for (row, row_colors) in rx.iter() {
@@ -124,11 +131,13 @@ impl Renderer {
                 image_slice[i] = color;
             }
         }
-        println!("done rendering, total elapsed {:.3} secs", now.elapsed().as_secs_f64());
+        println!(
+            "done rendering, total elapsed {:.3} secs",
+            now.elapsed().as_secs_f64()
+        );
 
         image
     }
-
 
     /// Computes the color of a row (scanline) of pixels. `row` is the current row being rendered,
     /// where row ranges from 0..image_height
@@ -137,8 +146,8 @@ impl Renderer {
         &self,
         row: u32,
         world: &T,
-        camera: &Camera) -> Vec<Color>
-    {
+        camera: &Camera,
+    ) -> Vec<Color> {
         let mut rng = rand::thread_rng();
         let mut colors: Vec<Color> = Vec::with_capacity(camera.image_width as usize);
 
@@ -159,18 +168,11 @@ impl Renderer {
         colors
     }
 
-
-
     /// determine if a Ray has hit a `Hittable` object in the `world` and compute the pixel color
     /// of the Ray, `r`. The Hittable's `Material` is taken into account when performing ray bouncing
     /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
     /// was hit then the `background` color is returned, than a linearly blended "sky" color is returned
-    fn ray_color<T: Hittable + ?Sized>(
-        &self,
-        ray: &Ray,
-        world: &T,
-        depth: u32) -> Color
-    {
+    fn ray_color<T: Hittable + ?Sized>(&self, ray: &Ray, world: &T, depth: u32) -> Color {
         // exceeded the ray bounce limit, no more light is gathered
         if depth == 0 {
             return Color::default();
@@ -184,16 +186,15 @@ impl Renderer {
             if let Some(scatter_rec) = rec.mat_ptr.scatter(ray, rec) {
                 emitted
                     + scatter_rec.attenuation
-                    * self.ray_color(&scatter_rec.scattered, world, depth - 1)
+                        * self.ray_color(&scatter_rec.scattered, world, depth - 1)
             } else {
                 emitted
             }
-
         } else {
             // nothing hit, return the background color
             match self.background_color {
                 BackgroundColor::Solid(color) => color,
-                BackgroundColor::LinearInterp(from, to) => Renderer::linear_blend(ray, &from, &to)
+                BackgroundColor::LinearInterp(from, to) => Renderer::linear_blend(ray, &from, &to),
             }
         }
     }
@@ -206,7 +207,6 @@ impl Renderer {
         // blue is 0.5, 0.7, 1.0
         (1.0 - t) * *from + t * *to
     }
-
 
     /// Returns a new pixel color using multi-sample color computation
     fn multi_sample(pixel_color: &Color, samples_per_pixel: u32) -> Color {
@@ -224,9 +224,7 @@ impl Renderer {
         Color::new(
             256.0 * common::clamp(r, 0.0, 0.999),
             256.0 * common::clamp(g, 0.0, 0.999),
-            256.0 * common::clamp(b, 0.0, 0.999)
+            256.0 * common::clamp(b, 0.0, 0.999),
         )
     }
-
 }
-

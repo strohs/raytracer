@@ -1,8 +1,8 @@
-use std::fmt::{Display, Formatter, Result};
-use std::ops::{Neg, Add, Sub, Div, Mul, AddAssign, MulAssign, DivAssign, Index, IndexMut};
 use crate::common::clamp;
 use core::f64::consts::PI;
 use rand::Rng;
+use std::fmt::{Display, Formatter, Result};
+use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub};
 
 /// a 3 dimensional vector containing `x`,`y` and `z` coordinates
 #[derive(Default, Debug, PartialEq, Clone, Copy)]
@@ -39,16 +39,14 @@ impl Vec3 {
 
     /// returns the dot product of this Vec3 and other
     pub fn dot(&self, other: &Self) -> f64 {
-        self.x * other.x
-            + self.y * other.y
-            + self.z * other.z
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     /// returns the square of this Vec3's length, which is equal to this Vec3 dotted with itself
     pub fn length_squared(&self) -> f64 {
         self.dot(self)
     }
-    
+
     /// returns a new Vec3 that is the cross product of this Vec3 and other
     pub fn cross(&self, other: Self) -> Self {
         Self {
@@ -62,7 +60,6 @@ impl Vec3 {
     pub fn unit_vector(&self) -> Self {
         *self / self.length()
     }
-
 
     /// returns a `Vec3` with it's `x,y,z` fields set to a random f64 in the range `0..1`
     pub fn random() -> Self {
@@ -91,7 +88,7 @@ impl Vec3 {
         loop {
             let p = Vec3::random_range(-1.0, 1.0);
             if p.length_squared() < 1.0 {
-                return p
+                return p;
             }
         }
     }
@@ -131,12 +128,9 @@ impl Vec3 {
     pub fn random_in_unit_disk() -> Self {
         let mut rng = rand::thread_rng();
         loop {
-            let p = Vec3::new(
-                rng.gen_range(-1.0, 1.0),
-                rng.gen_range(-1.0, 1.0),
-                0.0);
+            let p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), 0.0);
             if p.length_squared() < 1.0 {
-                return p
+                return p;
             }
         }
     }
@@ -148,7 +142,6 @@ impl Vec3 {
         self.z = clamp(self.z, min, max);
     }
 }
-
 
 impl Neg for Vec3 {
     type Output = Vec3;
@@ -195,7 +188,7 @@ impl Add for Vec3 {
         Self {
             x: self.x + rhs.x,
             y: self.y + rhs.y,
-            z: self.z + rhs.z
+            z: self.z + rhs.z,
         }
     }
 }
@@ -226,7 +219,6 @@ impl Sub for Vec3 {
 }
 
 impl AddAssign for Vec3 {
-
     /// add two Vec3's together using the `+=` operator
     /// corresponding x,y,z are added together and the result is stored in this Vec3
     fn add_assign(&mut self, rhs: Self) {
@@ -311,7 +303,6 @@ impl Mul<Vec3> for f64 {
 }
 
 impl MulAssign<f64> for Vec3 {
-
     /// multiply each x,y,z of this Vec3 by a scalar `f64` value and store the result in
     /// this Vec3
     fn mul_assign(&mut self, rhs: f64) {
@@ -326,7 +317,6 @@ impl Div<f64> for Vec3 {
 
     /// divide each x,y,z field of this Vec3 by a scalar (f64) value and return a new Vec3
     fn div(self, rhs: f64) -> Self::Output {
-
         Self {
             x: self.x / rhs,
             y: self.y / rhs,
@@ -336,7 +326,6 @@ impl Div<f64> for Vec3 {
 }
 
 impl DivAssign<f64> for Vec3 {
-
     /// divide each x,y,z field of this Vec3 by a scalar f64 value and store the result
     /// in this Vec3
     fn div_assign(&mut self, rhs: f64) {
@@ -345,8 +334,6 @@ impl DivAssign<f64> for Vec3 {
         self.z = self.z / rhs;
     }
 }
-
-
 
 impl Index<usize> for Vec3 {
     type Output = f64;
@@ -360,13 +347,12 @@ impl Index<usize> for Vec3 {
             0 => &self.x,
             1 => &self.y,
             2 => &self.z,
-            _ => panic!("index must be in range 0..2 inclusive")
+            _ => panic!("index must be in range 0..2 inclusive"),
         }
     }
 }
 
 impl IndexMut<usize> for Vec3 {
-
     /// returns the x,y or z value of this Vec3 using the index operator `[]`
     ///
     /// # Panics
@@ -376,7 +362,7 @@ impl IndexMut<usize> for Vec3 {
             0 => &mut self.x,
             1 => &mut self.y,
             2 => &mut self.z,
-            _ => panic!("index must be in range 0..2 inclusive")
+            _ => panic!("index must be in range 0..2 inclusive"),
         }
     }
 }

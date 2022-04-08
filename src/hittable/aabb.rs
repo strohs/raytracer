@@ -8,25 +8,18 @@ pub struct Aabb {
 }
 
 impl Default for Aabb {
-
     /// Returns an `Aabb` with `min` set to `INFINITY` and `max` set to `NEG_INFINITY`
     fn default() -> Self {
         let min = Point3::new(f64::INFINITY, f64::INFINITY, f64::INFINITY);
         let max = Point3::new(f64::NEG_INFINITY, f64::NEG_INFINITY, f64::NEG_INFINITY);
 
-        Self {
-            min,
-            max
-        }
+        Self { min, max }
     }
 }
 
 impl Aabb {
     pub fn new(a: Point3, b: Point3) -> Self {
-        Self {
-            min: a,
-            max: b,
-        }
+        Self { min: a, max: b }
     }
 
     /// Returns the minimum bound of this bounding box
@@ -70,12 +63,14 @@ impl Aabb {
         let small: Point3 = Point3::new(
             box0.min().x().min(box1.min().x()),
             box0.min().y().min(box1.min().y()),
-            box0.min().z().min(box1.min().z()));
+            box0.min().z().min(box1.min().z()),
+        );
 
         let big: Point3 = Point3::new(
             box0.max().x().max(box1.max().x()),
             box0.max().y().max(box1.max().y()),
-            box0.max().z().max(box1.max().z()));
+            box0.max().z().max(box1.max().z()),
+        );
 
         Aabb::new(small, big)
     }

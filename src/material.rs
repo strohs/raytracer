@@ -13,10 +13,10 @@ pub use diffuse_light::*;
 pub mod isotropic;
 pub use isotropic::*;
 
-use crate::common::{Ray, Color, Vec3, Point3};
+use crate::common::{Color, Point3, Ray, Vec3};
 use crate::hittable::HitRecord;
-use std::ops::Neg;
 use std::fmt::Debug;
+use std::ops::Neg;
 
 /// holds the results of how a `Material` scattered an incoming `Ray`.
 /// `attenuation` contains what `Color` was applied by the material to the incoming Ray
@@ -29,15 +29,15 @@ pub struct ScatterRecord {
 
 impl ScatterRecord {
     pub fn new(attenuation: Color, scattered: Ray) -> Self {
-        Self { attenuation, scattered }
+        Self {
+            attenuation,
+            scattered,
+        }
     }
 }
 
-
-
 /// A trait for different material types that could be applied to a `Hittable`.
 pub trait Material: Send + Sync + Debug {
-
     /// Returns `Some(ScatterRecord)` if this material scattered the incoming Ray `r_in`.
     /// If this material did not scatter `r_in`, `None` is returned
     fn scatter(&self, r_in: &Ray, rec: &HitRecord) -> Option<ScatterRecord>;

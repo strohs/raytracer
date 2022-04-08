@@ -1,6 +1,5 @@
-
-use rand::seq::SliceRandom;
 use crate::common::{Point3, Vec3};
+use rand::seq::SliceRandom;
 use std::fmt::Formatter;
 
 const POINT_COUNT: usize = 256;
@@ -26,7 +25,6 @@ impl Default for Perlin {
 }
 
 impl Perlin {
-
     /// Generates a new, randomized Perlin struct
     pub fn new() -> Self {
         let mut perlin = Perlin::default();
@@ -60,11 +58,9 @@ impl Perlin {
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
-                    let idx = (
-                        self.perm_x[(i + di) & 255] ^
-                            self.perm_y[(j + dj) & 255] ^
-                            self.perm_z[(k + dk) & 255]) as usize;
-
+                    let idx = (self.perm_x[(i + di) & 255]
+                        ^ self.perm_y[(j + dj) & 255]
+                        ^ self.perm_z[(k + dk) & 255]) as usize;
 
                     let c_idx = di + 2 * (dj + 2 * dk);
                     c[c_idx] = self.rand_vecs[idx];
@@ -99,19 +95,13 @@ impl Perlin {
         for (i, item) in arr.iter_mut().enumerate() {
             *item = i as i32;
         }
-        
+
         arr.shuffle(&mut rng);
     }
 }
 
-
 /// trilinear interpolation used to smooth out perlin noise
-fn perlin_interp(
-    c: &[Vec3; 8],
-    u: f64,
-    v: f64,
-    w: f64) -> f64
-{
+fn perlin_interp(c: &[Vec3; 8], u: f64, v: f64, w: f64) -> f64 {
     // Hermitian cubic used to smooth out the noise
     let uu = u * u * (3.0 - 2.0 * u);
     let vv = v * v * (3.0 - 2.0 * v);
@@ -134,11 +124,9 @@ fn perlin_interp(
     accum
 }
 
-
 /// only shows the first 5 values for array in the Perlin struct
 impl std::fmt::Debug for Perlin {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-
         f.debug_struct("Perlin")
             .field("rand_vecs", &format_args!("{:?}...", &self.rand_vecs[0..5]))
             .field("perm_x", &format_args!("{:?}...", &self.perm_x[0..5]))

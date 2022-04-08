@@ -1,6 +1,4 @@
-
 use crate::util::scenes::Scene;
-
 
 const VALID_SWITCHES: [&str; 6] = ["-h", "--help", "-a", "-p", "-s", "-w"];
 
@@ -32,7 +30,6 @@ impl Default for Command {
 
 impl Command {
     pub fn new(args: Vec<String>) -> Result<Command, String> {
-
         // if no options given, render CornellBox by default
         if args.len() == 1 {
             return Ok(Command::default());
@@ -49,28 +46,37 @@ impl Command {
 
         // check for and parse width
         if let Some(width) = Command::parse_width(&args) {
-            command = Command { width: width?, ..command }
+            command = Command {
+                width: width?,
+                ..command
+            }
         }
 
         // check for and parse aspect ratio
         if let Some(ratio) = Command::parse_aspect_ratio(&args) {
-            command = Command { aspect_ratio: ratio?, ..command }
+            command = Command {
+                aspect_ratio: ratio?,
+                ..command
+            }
         }
 
         // check for and parse samples per pixel
         if let Some(spp) = Command::parse_samples_per_pixel(&args) {
-            command = Command { samples_per_pixel: spp?, ..command }
+            command = Command {
+                samples_per_pixel: spp?,
+                ..command
+            }
         }
 
         // check for scene number
         let scene = Command::parse_scene_num(&args)?;
-        command = Command { scene: scene, ..command };
+        command = Command { scene, ..command };
 
         Ok(command)
     }
 
     /// parse aspect ratio. must be a float > 1.0
-    fn parse_aspect_ratio(args: &Vec<String>) -> Option<Result<f64, String>> {
+    fn parse_aspect_ratio(args: &[String]) -> Option<Result<f64, String>> {
         if let Some(idx) = args.iter().position(|e| e == "-a") {
             if let Some(ratio) = args.get(idx + 1) {
                 match ratio.parse::<f64>() {
@@ -86,7 +92,7 @@ impl Command {
     }
 
     /// parse the width parameter
-    fn parse_width(args: &Vec<String>) -> Option<Result<u32, String>> {
+    fn parse_width(args: &[String]) -> Option<Result<u32, String>> {
         if let Some(idx) = args.iter().position(|e| e == "-w") {
             if let Some(width) = args.get(idx + 1) {
                 match width.parse::<u32>() {
@@ -102,7 +108,7 @@ impl Command {
     }
 
     /// parse samples per pixel
-    fn parse_samples_per_pixel(args: &Vec<String>) -> Option<Result<u32, String>> {
+    fn parse_samples_per_pixel(args: &[String]) -> Option<Result<u32, String>> {
         if let Some(idx) = args.iter().position(|e| e == "-p") {
             if let Some(spp) = args.get(idx + 1) {
                 match spp.parse::<u32>() {
@@ -115,11 +121,10 @@ impl Command {
         } else {
             None
         }
-
     }
 
     /// parse scene number parameter
-    fn parse_scene_num(args: &Vec<String>) -> Result<Scene, String> {
+    fn parse_scene_num(args: &[String]) -> Result<Scene, String> {
         if let Some(idx) = args.iter().position(|e| e == "-s") {
             if let Some(scene_num) = args.get(idx + 1) {
                 if let Ok(num) = scene_num.parse::<u32>() {
@@ -140,13 +145,10 @@ impl Command {
     }
 
     // make sure all switches are valid
-    fn validate_switches(args: &Vec<String>) -> Result<bool, String> {
-        for (i, sw) in args.iter()
-            .enumerate()
-            .filter(|(_i, s)| s.starts_with("-")) {
-
+    fn validate_switches(args: &[String]) -> Result<bool, String> {
+        for (i, sw) in args.iter().enumerate().filter(|(_i, s)| s.starts_with('-')) {
             if !VALID_SWITCHES.contains(&&**sw) {
-                return Err(format!("{} is not a valid option\n{}", args[i], HELP))
+                return Err(format!("{} is not a valid option\n{}", args[i], HELP));
             }
         }
         Ok(true)
@@ -193,25 +195,29 @@ aspect ratio should be a floating point number >= 1.0  For example:
 1.85 = U.S. widescreen cinema format
 "#;
 
-
 #[cfg(test)]
 mod tests {
-    use crate::util::scenes::Scene;
     use super::Command;
+    use crate::util::scenes::Scene;
 
     #[test]
     fn valid_cornell_box_scene_number() {
-        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000 -s 1".split(' ').map(|s| s.to_string()).collect();
+        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000 -s 1"
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
         let com = Command::new(s);
 
         assert!(com.is_ok());
         assert_eq!(com.unwrap().scene, Scene::RandomSpheres);
-
     }
 
     #[test]
     fn invalid_cornell_box_scene_number() {
-        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000 -s 8".split(' ').map(|s| s.to_string()).collect();
+        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000 -s 8"
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
         let com_res = Command::new(s);
 
         assert!(com_res.is_err());
@@ -219,7 +225,10 @@ mod tests {
 
     #[test]
     fn scene_defaults_to_final_scene() {
-        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000".split(' ').map(|s| s.to_string()).collect();
+        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 1000"
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
         let com_res = Command::new(s);
 
         assert!(com_res.is_ok());
@@ -228,7 +237,10 @@ mod tests {
 
     #[test]
     fn samples_per_pixel_set_to_10000() {
-        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 10000".split(' ').map(|s| s.to_string()).collect();
+        let s: Vec<String> = "raytracer -w 400 -a 1.777 -p 10000"
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
         let com_res = Command::new(s);
 
         assert!(com_res.is_ok());
@@ -237,7 +249,10 @@ mod tests {
 
     #[test]
     fn samples_per_pixel_defaults_to_500() {
-        let s: Vec<String> = "raytracer -w 400 -a 1.777".split(' ').map(|s| s.to_string()).collect();
+        let s: Vec<String> = "raytracer -w 400 -a 1.777"
+            .split(' ')
+            .map(|s| s.to_string())
+            .collect();
         let com_res = Command::new(s);
 
         assert!(com_res.is_ok());

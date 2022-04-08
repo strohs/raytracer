@@ -1,13 +1,11 @@
-
-use raytracer::util::{scenes, ppm};
-use raytracer::renderer::{BackgroundColor, Renderer};
 use raytracer::common::Color;
-use std::{env, process};
+use raytracer::renderer::{BackgroundColor, Renderer};
 use raytracer::util::command::Command;
 use raytracer::util::scenes::Scene;
+use raytracer::util::{ppm, scenes};
+use std::{env, process};
 
 fn main() {
-
     // parse the command line options
     let args: Vec<String> = env::args().collect();
     let command = Command::new(args).unwrap_or_else(|err| {
@@ -21,57 +19,65 @@ fn main() {
     // build the camera, world and set the background color for each scene
     let (camera, world, renderer) = match command.scene {
         Scene::RandomSpheres => {
-            let (c,w) = scenes::build_random_sphere_scene(command.width, command.aspect_ratio);
+            let (c, w) = scenes::build_random_sphere_scene(command.width, command.aspect_ratio);
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
-                BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
-                pool_size);
+                BackgroundColor::LinearInterp(Color::new(1., 1., 1.), Color::new(0.5, 0.5, 1.0)),
+                pool_size,
+            );
             (c, w, renderer)
-        },
+        }
         Scene::CornellBox => {
-            let (c, w) = scenes::build_cornell_box_with_two_boxes(command.width, command.aspect_ratio);
+            let (c, w) =
+                scenes::build_cornell_box_with_two_boxes(command.width, command.aspect_ratio);
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
                 BackgroundColor::Solid(Color::default()),
-                pool_size);
+                pool_size,
+            );
             (c, w, renderer)
-        },
+        }
         Scene::CornellSmokeBoxes => {
             let (c, w) = scenes::build_cornell_smoke_box(command.width, command.aspect_ratio);
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
                 BackgroundColor::Solid(Color::default()),
-                pool_size);
+                pool_size,
+            );
             (c, w, renderer)
-        },
+        }
         Scene::Earth => {
-            let (c, w) = scenes::build_earth_scene(command.width, command.aspect_ratio, "./earthmap.jpg");
+            let (c, w) =
+                scenes::build_earth_scene(command.width, command.aspect_ratio, "./earthmap.jpg");
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
-                BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
-                pool_size);
+                BackgroundColor::LinearInterp(Color::new(1., 1., 1.), Color::new(0.5, 0.5, 1.0)),
+                pool_size,
+            );
             (c, w, renderer)
-        },
+        }
         Scene::PerlinSpheres => {
             let (c, w) = scenes::build_two_perlin_spheres(command.width, command.aspect_ratio);
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
-                BackgroundColor::LinearInterp(Color::new(1.,1.,1.,), Color::new(0.5, 0.5, 1.0)),
-                pool_size);
+                BackgroundColor::LinearInterp(Color::new(1., 1., 1.), Color::new(0.5, 0.5, 1.0)),
+                pool_size,
+            );
             (c, w, renderer)
-        },
+        }
         _ => {
             let (c, w) = scenes::build_final_scene(command.width, command.aspect_ratio);
             let renderer = Renderer::new(
                 50,
                 command.samples_per_pixel,
                 BackgroundColor::Solid(Color::default()),
-                pool_size);
+                pool_size,
+            );
             (c, w, renderer)
         }
     };
@@ -86,5 +92,4 @@ fn main() {
         Ok(()) => println!("test image created at {:?}", file_path),
         Err(e) => eprintln!("{}", e),
     }
-
 }

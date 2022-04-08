@@ -1,9 +1,9 @@
 use crate::common::{Point3, Ray, Vec3};
+use crate::hittable::{Aabb, HitRecord, Hittable};
 use crate::material::Material;
-use std::sync::Arc;
-use crate::hittable::{Hittable, HitRecord, Aabb};
-use std::fmt::Formatter;
 use crate::texture;
+use std::fmt::Formatter;
+use std::sync::Arc;
 
 /// a sphere that has its center move linearly from `center0` at `time0` to `center1` at `time1`.
 /// After that time interval, it continues on, so the times do not need to match up with the
@@ -20,11 +20,13 @@ pub struct MovingSphere {
 
 impl MovingSphere {
     pub fn new(
-        center0: Point3, center1: Point3,
-        time0: f64, time1: f64,
+        center0: Point3,
+        center1: Point3,
+        time0: f64,
+        time1: f64,
         radius: f64,
-        mat_ptr: Arc<dyn Material>) -> Self
-    {
+        mat_ptr: Arc<dyn Material>,
+    ) -> Self {
         Self {
             center0,
             center1,
@@ -38,8 +40,7 @@ impl MovingSphere {
     /// returns this moving sphere's center point at the given `time`
     pub fn center(&self, time: f64) -> Point3 {
         self.center0
-            + ((time - self.time0) / (self.time1 - self.time0))
-            * (self.center1 - self.center0)
+            + ((time - self.time0) / (self.time1 - self.time0)) * (self.center1 - self.center0)
     }
 
     /// Returns the radius of this Sphere
@@ -54,14 +55,16 @@ impl Hittable for MovingSphere {
         let build_hit_record = |t: f64| -> HitRecord {
             let hit_point = r.at(t);
             let outward_normal = (hit_point - self.center(r.time())) / self.radius;
-            let (u,v) = texture::get_sphere_uv(&outward_normal);
+            let (u, v) = texture::get_sphere_uv(&outward_normal);
             HitRecord::with_face_normal(
                 r,
                 hit_point,
                 &outward_normal,
                 Arc::clone(&self.mat_ptr),
                 t,
-                u,v)
+                u,
+                v,
+            )
         };
 
         // this sphere center at the the Ray's time
@@ -93,10 +96,12 @@ impl Hittable for MovingSphere {
     fn bounding_box(&self, t0: f64, t1: f64) -> Option<Aabb> {
         let box0 = Aabb::new(
             self.center(t0) - Vec3::new(self.radius(), self.radius(), self.radius()),
-            self.center(t0) + Vec3::new(self.radius(), self.radius(), self.radius()));
+            self.center(t0) + Vec3::new(self.radius(), self.radius(), self.radius()),
+        );
         let box1 = Aabb::new(
             self.center(t1) - Vec3::new(self.radius(), self.radius(), self.radius()),
-            self.center(t1) + Vec3::new(self.radius(), self.radius(), self.radius()));
+            self.center(t1) + Vec3::new(self.radius(), self.radius(), self.radius()),
+        );
 
         Some(Aabb::surrounding_box(&box0, &box1))
     }
@@ -104,7 +109,6 @@ impl Hittable for MovingSphere {
 
 impl std::fmt::Debug for MovingSphere {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-
         f.debug_struct("Sphere")
             .field("center0", &self.center0)
             .field("center1", &self.center1)

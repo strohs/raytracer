@@ -1,11 +1,10 @@
-use std::sync::Arc;
-use std::cmp::Ordering;
-use rand::{Rng, thread_rng};
-use crate::hittable::{Hittable, Aabb, HitRecord, HittableList};
 use crate::common::Ray;
-use std::fmt::{Formatter};
+use crate::hittable::{Aabb, HitRecord, Hittable, HittableList};
+use rand::{thread_rng, Rng};
+use std::cmp::Ordering;
 use std::fmt;
-
+use std::fmt::Formatter;
+use std::sync::Arc;
 
 /// A Bounded Volume Hierarchy (BVH)
 /// A BVH is `Hittable` but it’s really a container. It's a binary "tree like" structure that can
@@ -21,9 +20,7 @@ pub struct BvhNode {
     bbox: Aabb,
 }
 
-
 impl BvhNode {
-
     /// Constructs a BVH from the `list` of Hittables. The returned BVH will be the "root" node
     /// of the BVH
     pub fn from(list: &mut HittableList, time0: f64, time1: f64) -> BvhNode {
@@ -32,7 +29,7 @@ impl BvhNode {
 
     /// Constructs a single `BvhNode`
     fn new(left: Arc<dyn Hittable>, right: Arc<dyn Hittable>, bbox: Aabb) -> Self {
-        Self { left, right, bbox, }
+        Self { left, right, bbox }
     }
 
     /// Constructs a BVH from a list of Hittables.
@@ -41,15 +38,11 @@ impl BvhNode {
     /// children have smaller bounding boxes than their parent’s bounding box, but that is for
     /// speed not correctness. This function chooses the middle ground, at each node, split
     /// the list along one axis.
-    /// 
+    ///
     /// 1. randomly choose an axis
     /// 2. sort the (hittable) primitives
     /// 3. put half in each subtree
-    fn split_volumes(
-        objects: &mut [Arc<dyn Hittable>],
-        time0: f64,
-        time1: f64) -> BvhNode
-    {
+    fn split_volumes(objects: &mut [Arc<dyn Hittable>], time0: f64, time1: f64) -> BvhNode {
         // randomly choose an x,y, or z axis for sorting the list of hittable objects
         let axis: usize = thread_rng().gen_range(0, 3);
 
@@ -58,32 +51,32 @@ impl BvhNode {
             BvhNode::new(
                 Arc::clone(&objects[0]),
                 Arc::clone(&objects[0]),
-                Aabb::default())
+                Aabb::default(),
+            )
         } else if objects.len() == 2 {
             // if objects only has two elements, put one in each subtree and end recursion
             if BvhNode::box_compare(&*objects[0], &*objects[1], axis) == Ordering::Less {
                 BvhNode::new(
                     Arc::clone(&objects[0]),
                     Arc::clone(&objects[1]),
-                    Aabb::default())
+                    Aabb::default(),
+                )
             } else {
                 BvhNode::new(
                     Arc::clone(&objects[1]),
                     Arc::clone(&objects[0]),
-                    Aabb::default())
+                    Aabb::default(),
+                )
             }
         } else {
             // recursively partition the remaining hittables into BVH Nodes, using their
             // bounding box axis' to sort then into left and right children
-            objects.sort_unstable_by(|a,b| BvhNode::box_compare(&**a, &**b, axis));
+            objects.sort_unstable_by(|a, b| BvhNode::box_compare(&**a, &**b, axis));
             let mid = objects.len() / 2;
             let left = BvhNode::split_volumes(objects[0..mid].as_mut(), time0, time1);
             let right = BvhNode::split_volumes(objects[mid..].as_mut(), time0, time1);
 
-            BvhNode::new(
-                Arc::new(left),
-                Arc::new(right),
-                Aabb::default())
+            BvhNode::new(Arc::new(left), Arc::new(right), Aabb::default())
         };
 
         // construct a bounding box encompassing this node's left and right children
@@ -97,7 +90,6 @@ impl BvhNode {
         node
     }
 
-
     /// Compares the axis aligned bounding boxes of two `Hittable`s using their respective
     /// `Aabb.min()` parameters.
     /// `axis` indicates which axis to use in the comparison.
@@ -105,21 +97,27 @@ impl BvhNode {
     /// 1 = y-axis,
     /// 2 = z-axis
     fn box_compare<T: Hittable + ?Sized>(a: &T, b: &T, axis: usize) -> Ordering {
-        let box_a = a.bounding_box(0.0, 0.0)
+        let box_a = a
+            .bounding_box(0.0, 0.0)
             .expect("Hittable 'a' doesn't have a bounding box");
-        let box_b = b.bounding_box(0.0, 0.0)
+        let box_b = b
+            .bounding_box(0.0, 0.0)
             .expect("Hittable 'b' doesn't have a bounding box");
 
-        box_a.min()[axis].partial_cmp(&box_b.min()[axis])
-            .unwrap_or_else(|| panic!("could not compare axis {} of box 'a' {:?} against box 'b' {:?}",
-                                      axis,
-                                      box_a.min()[axis],
-                                      box_b.min()[axis]))
+        box_a.min()[axis]
+            .partial_cmp(&box_b.min()[axis])
+            .unwrap_or_else(|| {
+                panic!(
+                    "could not compare axis {} of box 'a' {:?} against box 'b' {:?}",
+                    axis,
+                    box_a.min()[axis],
+                    box_b.min()[axis]
+                )
+            })
     }
 }
 
 impl Hittable for BvhNode {
-
     /// Check if the bounding box for a node is hit, and if so, recursively check its children
     /// to determine which child was hit (if any).
     /// Returns a `HitRecord` for the deepest node that was hit
@@ -152,7 +150,6 @@ impl Hittable for BvhNode {
     }
 }
 
-
 impl std::fmt::Debug for BvhNode {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("BvhNode")
@@ -163,15 +160,14 @@ impl std::fmt::Debug for BvhNode {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
+    use crate::common::Point3;
+    use crate::hittable::{BvhNode, Sphere};
     use crate::material::{Lambertian, Material};
-    use crate::common::{Point3};
-    use crate::hittable::{Sphere, BvhNode};
-    use std::cmp::Ordering;
     use crate::texture::{SolidColor, Texture};
+    use std::cmp::Ordering;
+    use std::sync::Arc;
 
     #[test]
     fn box_compare_sphere1_x_axis_lt_sphere2() {
@@ -220,7 +216,10 @@ mod tests {
         let sphere1 = Sphere::new(Point3::new(2.0, 1.0, 1.0), 1.0, Arc::clone(&lamb_mat));
         let sphere2 = Sphere::new(Point3::new(1.0, 2.0, 2.0), 1.0, Arc::clone(&lamb_mat));
 
-        assert_eq!(BvhNode::box_compare(&sphere1, &sphere2, 0), Ordering::Greater);
+        assert_eq!(
+            BvhNode::box_compare(&sphere1, &sphere2, 0),
+            Ordering::Greater
+        );
     }
 
     // #[test]
