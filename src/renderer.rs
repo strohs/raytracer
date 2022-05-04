@@ -220,7 +220,7 @@ impl Renderer {
         g = f64::sqrt(scale * g);
         b = f64::sqrt(scale * b);
 
-        // compute a translated [0..255] color value for each color's R,G,B
+        // compute a translated [0..=255] color value for each color's R,G,B
         Color::new(
             256.0 * common::clamp(r, 0.0, 0.999),
             256.0 * common::clamp(g, 0.0, 0.999),

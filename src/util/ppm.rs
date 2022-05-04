@@ -6,6 +6,11 @@ use std::io::LineWriter;
 
 pub const MAX_RGB_COLOR: u8 = 255;
 
+/// writes the `image` data into a .ppm file
+/// `file_path` is the path to the image file that will be written to
+/// `width` the width of the image in pixels
+/// `height` the height of the image in pixels
+/// `image` the image data passed in as a slice of `Color`. The `Color` struct contains the actual RGB values
 pub fn write_file(file_path: &str, width: u32, height: u32, image: &[Color]) -> io::Result<()> {
     let file = File::create(file_path)?;
     let mut writer = LineWriter::new(file);

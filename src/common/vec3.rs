@@ -141,6 +141,11 @@ impl Vec3 {
         self.y = clamp(self.y, min, max);
         self.z = clamp(self.z, min, max);
     }
+
+    /// returns the `x, y, z` values of this Vec3 as an array of size 3: `[x, y, z]`
+    pub fn as_array(&self) -> [f64; 3] {
+        [self.x, self.y, self.z]
+    }
 }
 
 impl Neg for Vec3 {
@@ -522,5 +527,12 @@ mod tests {
     fn vec3_length_squared() {
         let v1 = Vec3::new(1.0, 2.0, 3.0);
         assert_eq!(v1.length_squared(), 14.0);
+    }
+
+    #[test]
+    fn vec3_as_array() {
+        let v = Vec3::new(10.0, 20.0, 30.0);
+        let varr = v.as_array();
+        assert_eq!(v.as_array(), varr);
     }
 }

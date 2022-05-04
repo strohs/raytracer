@@ -2,8 +2,9 @@ use raytracer::common::Color;
 use raytracer::renderer::{BackgroundColor, Renderer};
 use raytracer::util::command::Command;
 use raytracer::util::scenes::Scene;
-use raytracer::util::{ppm, scenes};
+use raytracer::util::{png, scenes};
 use std::{env, process};
+use std::path::PathBuf;
 
 fn main() {
     // parse the command line options
@@ -83,12 +84,12 @@ fn main() {
     };
 
     let (width, height) = (camera.image_width, camera.image_height);
-    let file_path = format!("./raytrace_{}x{}.ppm", width, height);
+    let file_path = PathBuf::from(format!("./raytrace_{:?}_{}x{}.png", command.scene, width, height));
     println!("rendering scene: {:?}", &command.scene);
 
     let image = renderer.render(camera, world);
     // write the image data to a PPM file
-    match ppm::write_file(&file_path, width, height, &image) {
+    match png::write_file(&file_path, width, height, &image) {
         Ok(()) => println!("test image created at {:?}", file_path),
         Err(e) => eprintln!("{}", e),
     }
