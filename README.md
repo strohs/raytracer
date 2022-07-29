@@ -1,4 +1,5 @@
-[![CircleCI](https://circleci.com/gh/strohs/raytracer.svg?style=shield)](https://circleci.com/gh/strohs/raytracer)
+![example workflow](https://github.com/strohs/raytracer/actions/workflows/rust.yml/badge.svg)
+
 
 # Rust Raytracer
 A Rust implementation of the software ray-tracer from the first two books of [Ray Tracing in One Weekend](https://raytracing.github.io/)
