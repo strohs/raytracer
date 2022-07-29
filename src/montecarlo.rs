@@ -6,8 +6,8 @@
 //     let mut rng = thread_rng();
 //
 //     for _ in 0..N {
-//         let x = rng.gen_range(-1.0, 1.0);
-//         let y = rng.gen_range(-1.0, 1.0);
+//         let x = rng.gen_range(-1.0..1.0);
+//         let y = rng.gen_range(-1.0..1.0);
 //
 //         if x * x + y * y < 1.0 {
 //             inside_circle += 1;
@@ -25,8 +25,8 @@
 //
 //     loop {
 //         runs += 1;
-//         let x = rng.gen_range(-1.0, 1.0);
-//         let y = rng.gen_range(-1.0, 1.0);
+//         let x = rng.gen_range(-1.0..1.0);
+//         let y = rng.gen_range(-1.0..1.0);
 //
 //         if x * x + y * y < 1.0 {
 //             inside_circle += 1;
@@ -47,8 +47,8 @@
 //
 //     for i in 0..sqrt_n {
 //         for j in 0..sqrt_n {
-//             let mut x = rng.gen_range(-1.0, 1.0);
-//             let mut y = rng.gen_range(-1.0, 1.0);
+//             let mut x = rng.gen_range(-1.0..1.0);
+//             let mut y = rng.gen_range(-1.0..1.0);
 //
 //             if x * x + y * y < 1.0 {
 //                 inside_circle += 1;

@@ -33,7 +33,7 @@ impl Camera {
             - offset;
 
         // generate a random amount of time the camera shutter was open
-        let shutter_open: f64 = rand::thread_rng().gen_range(self.open_time, self.close_time);
+        let shutter_open: f64 = rand::thread_rng().gen_range(self.open_time..self.close_time);
 
         Ray::new(self.look_from + offset, direction, shutter_open)
     }

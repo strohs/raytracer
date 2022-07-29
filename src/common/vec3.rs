@@ -75,9 +75,9 @@ impl Vec3 {
     pub fn random_range(min: f64, max: f64) -> Self {
         let mut rng = rand::thread_rng();
         Self {
-            x: rng.gen_range(min, max),
-            y: rng.gen_range(min, max),
-            z: rng.gen_range(min, max),
+            x: rng.gen_range(min..max),
+            y: rng.gen_range(min..max),
+            z: rng.gen_range(min..max),
         }
     }
 
@@ -98,8 +98,8 @@ impl Vec3 {
     /// a vector that is more uniformly distributed
     pub fn random_unit_vector() -> Self {
         let mut rng = rand::thread_rng();
-        let a = rng.gen_range(0.0, 2.0 * PI);
-        let z = rng.gen_range(-1.0, 1.0);
+        let a = rng.gen_range(0.0..(2.0 * PI));
+        let z = rng.gen_range(-1.0..1.0);
         let r = f64::sqrt(1.0 - z * z);
 
         Self {
@@ -128,7 +128,7 @@ impl Vec3 {
     pub fn random_in_unit_disk() -> Self {
         let mut rng = rand::thread_rng();
         loop {
-            let p = Vec3::new(rng.gen_range(-1.0, 1.0), rng.gen_range(-1.0, 1.0), 0.0);
+            let p = Vec3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0);
             if p.length_squared() < 1.0 {
                 return p;
             }

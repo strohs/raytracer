@@ -44,7 +44,7 @@ impl BvhNode {
     /// 3. put half in each subtree
     fn split_volumes(objects: &mut [Arc<dyn Hittable>], time0: f64, time1: f64) -> BvhNode {
         // randomly choose an x,y, or z axis for sorting the list of hittable objects
-        let axis: usize = thread_rng().gen_range(0, 3);
+        let axis: usize = thread_rng().gen_range(0..3);
 
         let mut node: BvhNode = if objects.len() == 1 {
             // if there's only one element, put a reference to it in each subtree and end recursion

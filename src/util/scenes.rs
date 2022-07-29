@@ -98,13 +98,13 @@ fn generate_random_spheres() -> HittableList {
                         0.2,
                         Arc::new(Lambertian::new(Arc::clone(&albedo))),
                     )));
-                // } else if prob < 0.4 {
-                //     // create a marble textured sphere
-                //     let marble_tex: Arc<dyn Texture> = Arc::new(Noise::new(Perlin::new(), 5.0));
-                //     let center = center + Vec3::new(0., rng.gen::<f64>(), 0.);
-                //     let mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&marble_tex)));
-                //     let sphere = Sphere::new(center, 0.2, mat);
-                //     world.add(Arc::new(sphere));
+                    // } else if prob < 0.4 {
+                    //     // create a marble textured sphere
+                    //     let marble_tex: Arc<dyn Texture> = Arc::new(Noise::new(Perlin::new(), 5.0));
+                    //     let center = center + Vec3::new(0., rng.gen::<f64>(), 0.);
+                    //     let mat: Arc<dyn Material> = Arc::new(Lambertian::new(Arc::clone(&marble_tex)));
+                    //     let sphere = Sphere::new(center, 0.2, mat);
+                    //     world.add(Arc::new(sphere));
                 } else if prob < 0.7 {
                     // create a solid color, Lambertian sphere
                     let solid_tex: Arc<dyn Texture> =
@@ -115,7 +115,7 @@ fn generate_random_spheres() -> HittableList {
                     world.add(Arc::new(sphere));
                 } else if prob < 0.95 {
                     let albedo = Color::random_range(0.5, 1.0);
-                    let fuzz = rng.gen_range(0.0, 0.5);
+                    let fuzz = rng.gen_range(0.0..0.5);
                     world.add(Arc::new(Sphere::new(
                         center,
                         0.2,
@@ -216,7 +216,7 @@ pub fn build_two_perlin_spheres(image_width: u32, aspect_ratio: f64) -> (Camera,
     (camera, world)
 }
 
-/// builds a scene with two checkered spheres on top of each other
+/// builds a scene with a single earth textured sphere
 ///
 pub fn build_earth_scene(
     image_width: u32,
@@ -526,7 +526,7 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64) -> (Camera, Hittab
             let z0 = -1000.0 + j as f64 * w as f64;
             let y0 = 0.0;
             let x1 = x0 + w;
-            let y1: f64 = rng.gen_range(1.0, 101.0);
+            let y1: f64 = rng.gen_range(1.0..101.0);
             let z1 = z0 + w;
 
             let box_inst = BoxInst::from(

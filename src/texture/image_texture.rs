@@ -21,7 +21,7 @@ impl ImageTexture {
         let img: DynamicImage = image::open(file_name)
             .unwrap_or_else(|_| panic!("could not load image at {}", file_name));
         let (width, height) = img.dimensions();
-        let data: Vec<u8> = img.into_rgb().into_vec();
+        let data: Vec<u8> = img.into_rgb8().into_vec();
         let bytes_per_scanline = width * BYTES_PER_PIXEL;
 
         Self {
@@ -39,7 +39,6 @@ impl Texture for ImageTexture {
         if self.data.is_empty() {
             return Color::new(0.0, 1.0, 1.0);
         }
-
         // clamp texture coordinates to [0,1] x [1,0]
         let u = clamp(u, 0.0, 1.0);
         let v = 1.0 - clamp(v, 0.0, 1.0); //flip v to image coordinates
