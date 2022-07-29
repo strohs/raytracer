@@ -3,11 +3,9 @@
 # Rust Raytracer
 A Rust implementation of the software ray-tracer from the first two books of [Ray Tracing in One Weekend](https://raytracing.github.io/)
 
-This implementation of the raytracer adds multi-threaded rendering, plus the ability to render one of the six sample scenes described in the book.
+This implementation of the raytracer adds multithreaded rendering, plus the ability to render one of the six sample scenes described in the book.
 
-The final rendered images are saved in the [ppm](http://ailab.eecs.wsu.edu/wise/P1/PPM.html) image format. Most modern image viewing programs 
-should be able to display .ppm image files. 
-On my linux system I used [feh](https://feh.finalrewind.org/)
+The final rendered images are saved as a .png image file
 
 ## Sample Scenes
 Here are the sample scenes from the book that can be generated using this raytracer.
@@ -53,7 +51,7 @@ run the raytracer executable from the command line without any options:
 
 this will generate the default scene: Cornell Box, with default settings of: width=1024 pixels, 
 aspect ratio=1.77 (16:9), and samples per pixel = 500
-The final image will be saved in the same directory that you invoked the raytracer from as a **.ppm** image
+The final image will be saved in the same directory that you invoked the raytracer from, as a **.png** image
 
 
 to get command line help:
