@@ -185,8 +185,7 @@ impl Renderer {
 
             if let Some(scatter_rec) = rec.mat_ptr.scatter(ray, rec) {
                 emitted
-                    + scatter_rec.attenuation
-                        * self.ray_color(&scatter_rec.scattered, world, depth - 1)
+                    + scatter_rec.attenuation * self.ray_color(&scatter_rec.scattered, world, depth - 1)
             } else {
                 emitted
             }

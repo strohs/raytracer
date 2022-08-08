@@ -1,4 +1,4 @@
-![example workflow](https://github.com/strohs/raytracer/actions/workflows/rust.yml/badge.svg)
+![example workflow](https://github.com/strohs/raytracer/actions/workflows/rust-build.yml/badge.svg)
 
 
 # Rust Raytracer
