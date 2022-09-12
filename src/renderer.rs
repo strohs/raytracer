@@ -198,6 +198,60 @@ impl Renderer {
         }
     }
 
+    // /// determine if a Ray has hit a `Hittable` object in the `world` and compute the pixel color
+    // /// of the Ray, `r`. The Hittable's `Material` is taken into account when performing ray bouncing
+    // /// (up to `MAX_RAY_BOUNCE_DEPTH` times) in order to get an accurate color determination. If nothing
+    // /// was hit then the `background` color is returned, than a linearly blended "sky" color is returned
+    // fn ray_color<T: Hittable + ?Sized>(&self, ray: &Ray, world: &T, mut depth: u32) -> Color {
+    //     // The original book algorithm used a recursive solution, I've converted it to iterative
+    //     // in order to get some speed gains
+    //
+    //     // holds (emittedColor, attenuatedColor) for each ray bounce
+    //     type ColorRec = (Color, Option<Color>);
+    //     // holds the ray color for each object hit
+    //     let mut stack: Vec<ColorRec> = vec![];
+    //     let mut ray = ray.clone();
+    //
+    //     loop {
+    //         if depth == 0 {
+    //             stack.push((Color::default(), None));
+    //             break;
+    //         } else {
+    //             // if a hittable was hit, determine if its material will scatter the incoming
+    //             // ray, AND how much light the material emits
+    //             if let Some(ref rec) = world.hit(&ray, 0.001, f64::INFINITY) {
+    //                 let emitted = rec.mat_ptr.emitted(rec.u, rec.v, &rec.p);
+    //
+    //                 if let Some(scatter_rec) = rec.mat_ptr.scatter(&ray, rec) {
+    //                     stack.push((emitted, Some(scatter_rec.attenuation)));
+    //                     ray = scatter_rec.scattered.to_owned();
+    //                     depth -= 1;
+    //                 } else {
+    //                     stack.push((emitted, None));
+    //                     break;
+    //                 }
+    //             } else {
+    //                 // nothing hit, return the background color
+    //                 match self.background_color {
+    //                     BackgroundColor::Solid(color) => stack.push((color, None)),
+    //                     BackgroundColor::LinearInterp(from, to) => stack.push((Renderer::linear_blend(&ray, &from, &to), None)),
+    //                 }
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     // now compute the final ray color based on data stored in the stack
+    //     let mut final_color = stack.pop().expect("color stack has at least one color").0;
+    //     for curr in stack.into_iter().rev() {
+    //         if let Some(att) = curr.1 {
+    //             final_color = curr.0 + att * final_color;
+    //         } else {
+    //             final_color = curr.0 + final_color;
+    //         }
+    //     }
+    //     final_color
+    // }
+
     /// Returns a linearly blended color between `from` and `to`. The input `ray`s
     /// y coordinate to determine how much of `from` or `to` to apply.
     fn linear_blend(ray: &Ray, from: &Color, to: &Color) -> Color {

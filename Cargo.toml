@@ -11,3 +11,4 @@ rand = "0.8.5"
 threadpool = "1.8.1"
 num_cpus = "1.13.0"
 image = "0.24.3"
+clap = { version = "3.2.20", features = ["derive"] }

@@ -7,9 +7,10 @@ use crate::material::{Dielectric, DiffuseLight, Lambertian, Material, Metal};
 use crate::texture::{CheckerTexture, ImageTexture, NoiseTexture, SolidColor, Texture};
 use rand::Rng;
 use std::sync::Arc;
+use clap::{ValueEnum};
 
 /// Scene lists the available pre-made, default scenes that can be rendered
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, ValueEnum)]
 pub enum Scene {
     RandomSpheres = 1,
     PerlinSpheres = 2,
