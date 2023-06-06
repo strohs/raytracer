@@ -523,8 +523,8 @@ pub fn build_final_scene(image_width: u32, aspect_ratio: f64) -> (Camera, Hittab
     for i in 0..boxes_per_side {
         for j in 0..boxes_per_side {
             let w = 100.0;
-            let x0 = -1000.0 + i as f64 * w as f64;
-            let z0 = -1000.0 + j as f64 * w as f64;
+            let x0 = -1000.0 + i as f64 * w;
+            let z0 = -1000.0 + j as f64 * w;
             let y0 = 0.0;
             let x1 = x0 + w;
             let y1: f64 = rng.gen_range(1.0..101.0);
