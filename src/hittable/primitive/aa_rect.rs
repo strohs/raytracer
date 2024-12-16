@@ -3,7 +3,7 @@ use crate::hittable::{Aabb, HitRecord, Hittable};
 use crate::material::Material;
 use std::sync::Arc;
 
-/// a 2D, `Hittable` rectangle, that's aligned on the **xy plane**
+/// a 2D, Axis-Aligned, `Hittable` rectangle, that's aligned on the **xy plane**
 #[derive(Debug)]
 pub struct XYRect {
     mp: Arc<dyn Material>,
